@@ -42,7 +42,7 @@ THREE.VRControls = function ( camera, done ) {
 
 	this._init();
 
-	this.manualRotation = quat.create();
+	this.manualRotation = new THREE.Quaternion();
 
 	this.manualControls = {
       65 : {index: 1, sign: 1, active: 0},  // a
@@ -61,7 +61,6 @@ THREE.VRControls = function ( camera, done ) {
       75 : {index: 7, sign: 1, active: 0},   // k
       74 : {index: 6, sign: 1, active: 0},   // j
       76 : {index: 6, sign: -1, active: 0}   // l
-
     };
 
 	this.manualRotateRate = new Float32Array([0.0, 0.0, 0.0]);
@@ -81,7 +80,8 @@ THREE.VRControls = function ( camera, done ) {
 		var interval = (newTime - oldTime) * 0.001;
 
 		///do translation
-		var m, offset;
+		var m;
+		var offset = new THREE.Vector3();
 		if (this.manualMoveRate[0] != 0 || this.manualMoveRate[1] != 0 || this.manualMoveRate[2] != 0){
 		    offset = getFwdVector().multiplyScalar(0.2 * interval * this.manualMoveRate[0]).add(
 		      		   getRightVector().multiplyScalar(0.2 * interval * this.manualMoveRate[1])).add(
@@ -112,33 +112,35 @@ THREE.VRControls = function ( camera, done ) {
 		currentBoost.elements = gramSchmidt( currentBoost.elements ); //seems more stable near infinity
 
 
-	  var update = quat.fromValues(this.manualRotateRate[0] * 0.2 * interval,
+	  var update = new THREE.Quaternion(this.manualRotateRate[0] * 0.2 * interval,
 	                               this.manualRotateRate[1] * 0.2 * interval,
 	                               this.manualRotateRate[2] * 0.2 * interval, 1.0);
-	  quat.normalize(update, update);
-	  quat.multiply(manualRotation, manualRotation, update);
+	  update.normalize();
+	  manualRotation.multiplyQuaternions(manualRotation, update);
 
 		if ( camera ) {
 			if ( !vrState ) {
-				camera.quaternion.fromArray(manualRotation);
+				camera.quaternion.copy(manualRotation);
+				// camera.position = camera.position.add(offset);
 				return;
 			}
 
 			// Applies head rotation from sensors data.
-			var totalRotation = quat.create();
-      var state = vrState.hmd.rotation;
-      if (vrState.hmd.rotation[0] !== 0 ||
-					vrState.hmd.rotation[1] !== 0 ||
-					vrState.hmd.rotation[2] !== 0 ||
-					vrState.hmd.rotation[3] !== 0) {
-        quat.multiply(totalRotation, manualRotation, vrState.hmd.rotation);
+			var totalRotation = new THREE.Quaternion();
+
+      if (vrState !== null) {
+					var vrStateRotation = new THREE.Quaternion(vrState.hmd.rotation[0], vrState.hmd.rotation[1], vrState.hmd.rotation[2], vrState.hmd.rotation[3]);
+	        totalRotation.multiplyQuaternions(manualRotation, vrStateRotation);
       } else {
-        totalRotation = manualRotation;
+        	totalRotation = manualRotation;
       }
 
-			camera.quaternion.fromArray( totalRotation );
-		}
+			camera.quaternion.copy(totalRotation);
 
+			if (vrState.hmd.position !== null) {
+				// camera.position.copy( {x: vrState.hmd.position[0], y: vrState.hmd.position[1], z: vrState.hmd.position[2]} ).multiplyScalar( this.scale );
+			}
+		}
 	};
 
 	this.zeroSensor = function() {
@@ -152,32 +154,50 @@ THREE.VRControls = function ( camera, done ) {
 	this.getVRState = function() {
 		var vrInput = this._vrInput;
 		var orientation;
+		var position;
 		var vrState;
+
 		if ( vrInput ) {
-			orientation	= vrInput.getState().orientation;
+			if (vrInput.getState !== undefined) {
+				orientation	= vrInput.getState().orientation;
+				orientation = [orientation.x, orientation.y, orientation.z, orientation.w];
+				position = vrInput.getState().position;
+				position = [position.x, position.y, position.z];
+			} else {
+				orientation	= vrInput.getPose().orientation;
+				position = vrInput.getPose().position;
+			}
 		} else if (this.phoneVR.rotationQuat()) {
 			orientation = this.phoneVR.rotationQuat();
+			orientation = [orientation.x, orientation.y, orientation.z, orientation.w];
+			position = this._defaultPosition;
 		} else {
 			return null;
 		}
-		
+
 		if (orientation == null) {
 			return null;
 		}
 		vrState = {
 			hmd : {
 				rotation : [
-					orientation.x,
-					orientation.y,
-					orientation.z,
-					orientation.w
+					orientation[0],
+					orientation[1],
+					orientation[2],
+					orientation[3]
+				],
+				position : [
+					position[0],
+					position[1],
+					position[2]
 				]
 			}
 		};
+
 		return vrState;
 	};
-
 };
+
 
 /*
 Listen for double click event to enter full-screen VR mode
@@ -215,7 +235,7 @@ window.addEventListener("keydown", onkey, true);
 function key(event, sign) {
   var control = controls.manualControls[event.keyCode];
 
-  if (sign === 1 && control.active || sign === -1 && !control.active) {
+  if (control == undefined || sign === 1 && control.active || sign === -1 && !control.active) {
     return;
   }
 
