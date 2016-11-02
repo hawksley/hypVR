@@ -7,20 +7,33 @@ THREE.VRControls = function ( camera, done ) {
 	this.phoneVR = new PhoneVR();
 
 	this._camera = camera;
+	this._oldVRState;
 
 	this._init = function () {
 		var self = this;
-		if ( !navigator.mozGetVRDevices && !navigator.getVRDevices ) {
-			if ( done ) {
-				done("Your browser is not VR Ready");
-			}
+		if (!navigator.getVRDisplays && !navigator.mozGetVRDevices && !navigator.getVRDevices) {
 			return;
 		}
-		if ( navigator.getVRDevices ) {
+		if (navigator.getVRDisplays) {
+			navigator.getVRDisplays().then( gotVRDisplay );
+		}else if ( navigator.getVRDevices ) {
 			navigator.getVRDevices().then( gotVRDevices );
 		} else {
 			navigator.mozGetVRDevices( gotVRDevices );
 		}
+
+		function gotVRDisplay( devices) {
+			var vrInput;
+			var error;
+			for ( var i = 0; i < devices.length; ++i ) {
+				if ( devices[i] instanceof VRDisplay ) {
+					vrInput = devices[i]
+					self._vrInput = vrInput;
+					break; // We keep the first we encounter
+				}
+			}
+		}
+
 		function gotVRDevices( devices ) {
 			var vrInput;
 			var error;
@@ -30,12 +43,6 @@ THREE.VRControls = function ( camera, done ) {
 					self._vrInput = vrInput;
 					break; // We keep the first we encounter
 				}
-			}
-			if ( done ) {
-				if ( !vrInput ) {
-				 error = 'HMD not available';
-				}
-				done( error );
 			}
 		}
 	};
@@ -82,24 +89,31 @@ THREE.VRControls = function ( camera, done ) {
 		///do translation
 		var m;
 		var offset = new THREE.Vector3();
-		if (this.manualMoveRate[0] != 0 || this.manualMoveRate[1] != 0 || this.manualMoveRate[2] != 0){
+		if (vrState !== null && vrState.hmd.lastPosition !== undefined) {
+			offset.x = vrState.hmd.lastPosition[0] - vrState.hmd.position[0];
+			offset.y = vrState.hmd.lastPosition[1] - vrState.hmd.position[1];
+			offset.z = vrState.hmd.lastPosition[2] - vrState.hmd.position[2]; 
+		    m = translateByVector(offset);
+		    m.multiply(currentBoost);
+		    currentBoost.copy(m);
+		} else if (this.manualMoveRate[0] != 0 || this.manualMoveRate[1] != 0 || this.manualMoveRate[2] != 0) {
 		    offset = getFwdVector().multiplyScalar(0.2 * interval * this.manualMoveRate[0]).add(
 		      		   getRightVector().multiplyScalar(0.2 * interval * this.manualMoveRate[1])).add(
 		      		   getUpVector().multiplyScalar(0.2 * interval * this.manualMoveRate[2]));
 		    m = translateByVector(offset);
 		    m.multiply(currentBoost);
 		    currentBoost.copy(m);
-		    }
+		}
 
 		//do parabolic motion
 		var m2, parabolicVector;
-		if (this.manualParabolicRate[0] != 0 || this.manualParabolicRate[1] != 0){
+		if (this.manualParabolicRate[0] != 0 || this.manualParabolicRate[1] != 0) {
 			parabolicVector = new THREE.Vector2(0.2 * interval * this.manualParabolicRate[0],
 												0.2 * interval * this.manualParabolicRate[1]);
 		    m2 = parabolicBy2DVector(parabolicVector);
 		    m2.multiply(currentBoost);
 		    currentBoost.copy(m2);
-		    }
+		}
 
 		//if outside central cell, move back
 		if (fixOutside){
@@ -153,6 +167,7 @@ THREE.VRControls = function ( camera, done ) {
 
 	this.getVRState = function() {
 		var vrInput = this._vrInput;
+		var oldVRState = this._oldVRState;
 		var orientation;
 		var position;
 		var vrState;
@@ -194,25 +209,23 @@ THREE.VRControls = function ( camera, done ) {
 			}
 		};
 
+		if (oldVRState !== undefined) {
+			vrState.hmd.lastPosition = oldVRState.hmd.position;
+		}
+
+		this._oldVRState = vrState;
+
 		return vrState;
 	};
 };
 
-
+var vrMode = false;
 /*
 Listen for double click event to enter full-screen VR mode
 */
 document.body.addEventListener( 'dblclick', function() {
   effect.setFullScreen( true );
 });
-
-function playPause() {
-  if (music.paused) {
-    music.play();
-  } else{
-    music.pause();
-  }
-}
 
 /*
 Listen for keyboard events
@@ -222,11 +235,12 @@ function onkey(event) {
 
   if (event.keyCode == 90) { // z
     controls.zeroSensor(); //zero rotation
-  } else if (event.keyCode == 70 || event.keyCode == 13) { //f or enter
+  } else if (event.keyCode == 70 || event.keyCode == 13) { //f
     effect.setFullScreen(true); //fullscreen
-  } else if (event.keyCode == 32 || event.keyCode == 80) {//space or p
-    playPause();
-  }
+  } else if (event.keyCode == 86 || event.keyCode == 13 || event.keyCode == 32 ) { // v or 'enter' or 'space' for VR mode
+    vrMode = !vrMode;
+    effect.setVRMode(vrMode);
+  }		  
 }
 
 window.addEventListener("keydown", onkey, true);
