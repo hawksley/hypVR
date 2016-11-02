@@ -88,19 +88,20 @@ THREE.VRControls = function ( camera, done ) {
 
 		///do translation
 		var m;
-		var offset = new THREE.Vector3();
+		var offset;
 		if (vrState !== null && vrState.hmd.lastPosition !== undefined) {
+			offset = new THREE.Vector3();
 			offset.x = vrState.hmd.lastPosition[0] - vrState.hmd.position[0];
 			offset.y = vrState.hmd.lastPosition[1] - vrState.hmd.position[1];
 			offset.z = vrState.hmd.lastPosition[2] - vrState.hmd.position[2]; 
-		    m = translateByVector(offset);
-		    m.multiply(currentBoost);
-		    currentBoost.copy(m);
 		} else if (this.manualMoveRate[0] != 0 || this.manualMoveRate[1] != 0 || this.manualMoveRate[2] != 0) {
 		    offset = getFwdVector().multiplyScalar(0.2 * interval * this.manualMoveRate[0]).add(
 		      		   getRightVector().multiplyScalar(0.2 * interval * this.manualMoveRate[1])).add(
 		      		   getUpVector().multiplyScalar(0.2 * interval * this.manualMoveRate[2]));
-		    m = translateByVector(offset);
+
+		}
+		if (offset !== undefined) {
+			m = translateByVector(offset);
 		    m.multiply(currentBoost);
 		    currentBoost.copy(m);
 		}
