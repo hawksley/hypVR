@@ -142,7 +142,7 @@ THREE.VREffect = function ( renderer, done ) {
 		renderer.setScissorTest( true );
 		renderer.clear();
 
-		if ( camera.parent === undefined ) {
+		if ( camera.parent === null ) {
 			camera.updateMatrixWorld();
 		}
 
