@@ -25,15 +25,7 @@
 THREE.VREffect = function ( renderer, done ) {
 
 	var cameraLeft = new THREE.PerspectiveCamera();
-	cameraLeft.layers.enable( 1 );
-
 	var cameraRight = new THREE.PerspectiveCamera();
-	cameraRight.layers.enable( 2 );
-
-	var eyeTranslationL = new THREE.Vector3();
-	var eyeTranslationR = new THREE.Vector3();
-	var renderRectL, renderRectR;
-	var eyeFOVL, eyeFOVR;
 
 	this._renderer = renderer;
 
@@ -138,59 +130,47 @@ THREE.VREffect = function ( renderer, done ) {
 	};
 
 	this.renderStereo = function( scene, camera, renderTarget, forceClear ) {
+
+		var leftEyeTranslation = this.leftEyeTranslation;
+		var rightEyeTranslation = this.rightEyeTranslation;
 		var renderer = this._renderer;
-		var vrHMD = this._vrHMD;
-			var autoUpdate = scene.autoUpdate;
+		var size = renderer.getSize();
+		var rendererWidth = size.width;
+		var rendererHeight = size.height;
+		var eyeDivisionLine = rendererWidth / 2;
 
-			if ( autoUpdate ) {
-				scene.updateMatrixWorld();
-				scene.autoUpdate = false;
-			}
+		renderer.setScissorTest( true );
+		renderer.clear();
 
-			var eyeParamsL = vrHMD.getEyeParameters( 'left' );
-			var eyeParamsR = vrHMD.getEyeParameters( 'right' );
+		if ( camera.parent === undefined ) {
+			camera.updateMatrixWorld();
+		}
 
-			eyeTranslationL.fromArray( eyeParamsL.offset );
-			eyeTranslationR.fromArray( eyeParamsR.offset );
-			eyeFOVL = eyeParamsL.fieldOfView;
-			eyeFOVR = eyeParamsR.fieldOfView;
+		cameraLeft.projectionMatrix = this.FovToProjection( this.leftEyeFOV, true, camera.near, camera.far );
+		cameraRight.projectionMatrix = this.FovToProjection( this.rightEyeFOV, true, camera.near, camera.far );
 
-			// When rendering we don't care what the recommended size is, only what the actual size
-			// of the backbuffer is.
-			var size = renderer.getSize();
-			renderRectL = { x: 0, y: 0, width: size.width / 2, height: size.height };
-			renderRectR = { x: size.width / 2, y: 0, width: size.width / 2, height: size.height };
+		camera.matrixWorld.decompose( cameraLeft.position, cameraLeft.quaternion, cameraLeft.scale );
+		camera.matrixWorld.decompose( cameraRight.position, cameraRight.quaternion, cameraRight.scale );
 
-			renderer.setScissorTest( true );
-			renderer.clear();
+		if (leftEyeTranslation.x !== undefined) {
+			cameraLeft.translateX( leftEyeTranslation.x );
+			cameraRight.translateX( rightEyeTranslation.x );
+		} else {
+			cameraLeft.translateX( leftEyeTranslation[0] );
+			cameraRight.translateX( rightEyeTranslation[0] );
+		}
 
-			if ( camera.parent === null ) camera.updateMatrixWorld();
 
-			cameraLeft.projectionMatrix = this.FovToProjection( eyeFOVL, true, camera.near, camera.far );
-			cameraRight.projectionMatrix = this.FovToProjection( eyeFOVR, true, camera.near, camera.far );
+		// render left eye
+		renderer.setViewport( 0, 0, eyeDivisionLine, rendererHeight );
+		renderer.setScissor( 0, 0, eyeDivisionLine, rendererHeight );
+		renderer.render( scene, cameraLeft );
 
-			camera.matrixWorld.decompose( cameraLeft.position, cameraLeft.quaternion, cameraLeft.scale );
-			camera.matrixWorld.decompose( cameraRight.position, cameraRight.quaternion, cameraRight.scale );
+		// render right eye
+		renderer.setViewport( eyeDivisionLine, 0, eyeDivisionLine, rendererHeight );
+		renderer.setScissor( eyeDivisionLine, 0, eyeDivisionLine, rendererHeight );
+		renderer.render( scene, cameraRight );
 
-			var scale = this.scale;
-			cameraLeft.translateOnAxis( eyeTranslationL, scale );
-			cameraRight.translateOnAxis( eyeTranslationR, scale );
-
-			// render left eye
-			renderer.setViewport( renderRectL.x, renderRectL.y, renderRectL.width, renderRectL.height );
-			renderer.setScissor( renderRectL.x, renderRectL.y, renderRectL.width, renderRectL.height );
-			renderer.render( scene, cameraLeft );
-
-			// render right eye
-			renderer.setViewport( renderRectR.x, renderRectR.y, renderRectR.width, renderRectR.height );
-			renderer.setScissor( renderRectR.x, renderRectR.y, renderRectR.width, renderRectR.height );
-			renderer.render( scene, cameraRight );
-
-			renderer.setScissorTest( false );
-
-			if ( autoUpdate ) {
-				scene.autoUpdate = true;
-			}
 	};
 
 	this.setSize = function( width, height ) {
