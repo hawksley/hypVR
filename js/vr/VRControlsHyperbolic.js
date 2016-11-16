@@ -143,18 +143,18 @@ THREE.VRControls = function ( camera, done ) {
 			// Applies head rotation from sensors data.
 			var totalRotation = new THREE.Quaternion();
 
-      if (vrState !== null) {
-					var vrStateRotation = new THREE.Quaternion(vrState.hmd.rotation[0], vrState.hmd.rotation[1], vrState.hmd.rotation[2], vrState.hmd.rotation[3]);
-	        totalRotation.multiplyQuaternions(manualRotation, vrStateRotation);
-      } else {
-        	totalRotation = manualRotation;
-      }
+		    if (vrState !== null) {
+				var vrStateRotation = new THREE.Quaternion(vrState.hmd.rotation[0], vrState.hmd.rotation[1], vrState.hmd.rotation[2], vrState.hmd.rotation[3]);
+			    totalRotation.multiplyQuaternions(manualRotation, vrStateRotation);
+		    } else {
+		      	totalRotation = manualRotation;
+		    }
 
 			camera.quaternion.copy(totalRotation);
 
-			if (vrState.hmd.position !== null) {
-				// camera.position.copy( {x: vrState.hmd.position[0], y: vrState.hmd.position[1], z: vrState.hmd.position[2]} ).multiplyScalar( this.scale );
-			}
+			// if (vrState.hmd.position !== null) {
+			// 	camera.position.copy( {x: vrState.hmd.position[0], y: vrState.hmd.position[1], z: vrState.hmd.position[2]} ).multiplyScalar( this.scale );
+			// }
 		}
 	};
 
@@ -220,6 +220,7 @@ THREE.VRControls = function ( camera, done ) {
 	};
 };
 
+var fixOutside = true; //moves you back inside the central cell if you leave it
 var vrMode = false;
 /*
 Listen for double click event to enter full-screen VR mode
@@ -241,6 +242,8 @@ function onkey(event) {
   } else if (event.keyCode == 86 || event.keyCode == 13 || event.keyCode == 32 ) { // v or 'enter' or 'space' for VR mode
     vrMode = !vrMode;
     effect.setVRMode(vrMode);
+  } else if (event.keyCode == 84) {
+  	fixOutside = !fixOutside;
   }		  
 }
 
