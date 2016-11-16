@@ -244,7 +244,9 @@ function onkey(event) {
     effect.setVRMode(vrMode);
   } else if (event.keyCode == 84) {
   	fixOutside = !fixOutside;
-  }		  
+  }	else if (event.keyCode == 82) {
+  	fixOutsideCentralCell( currentBoost, tilingGens );
+  }	  
 }
 
 window.addEventListener("keydown", onkey, true);
