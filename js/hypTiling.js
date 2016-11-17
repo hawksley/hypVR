@@ -32,9 +32,10 @@ var numObjects = 1; //number of obj files to load
 var numGens = tilingGens.length;
 var tilingDepth = 4; 
 
-var unpackPair = makeTsfmsList( tilingGens, tilingDepth );
-var tsfms = unpackPair[0];
-var cumulativeNumTsfms = unpackPair[1];
+var unpackTriple = makeTsfmsList( tilingGens, tilingDepth );
+var tsfms = unpackTriple[0];
+var words = unpackTriple[1];
+var cumulativeNumTsfms = unpackTriple[2];
 
 var numTiles = tsfms.length;
 var bigMatArray = new Array(numObjects * numTiles);

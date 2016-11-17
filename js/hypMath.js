@@ -62,6 +62,7 @@ function makeTsfmsList( tilingGens, tilingDepth ) {
 	}
 	var numGens = tilingGens.length;
 	var tsfms = [];
+    var words = [];
 	for (var j = 0; j < Math.pow(numGens, tilingDepth); j++) {
 	    var digits = [];
 	    var jcopy = j;
@@ -77,6 +78,7 @@ function makeTsfmsList( tilingGens, tilingDepth ) {
 
 	    if ( !isMatrixInArray(newTsfm, tsfms) ) {
 	      tsfms[tsfms.length] = newTsfm;
+          words[words.length] = digits;
 	      numTsfmsEachDepth[digitsDepth(digits)] += 1;
 	    }
 	}
@@ -87,7 +89,7 @@ function makeTsfmsList( tilingGens, tilingDepth ) {
 			cumulativeNumTsfms[i] += cumulativeNumTsfms[i-1];
 		}
 	}
-	return [tsfms, cumulativeNumTsfms];
+	return [tsfms, words, cumulativeNumTsfms];
 }
 
 function translateByVector(v) {
