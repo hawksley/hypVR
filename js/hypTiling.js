@@ -40,17 +40,7 @@ var cumulativeNumTsfms = unpackTriple[2];
 var numTiles = tsfms.length;
 var bigMatArray = new Array(numObjects * numTiles);
 
-function word2color(word) {
-    // word is a list of indexes into tilingGens
-    var count = 0;
-    for (var j = 0; j < word.length; j++){
-        if (word[j] != 0){
-            count++;
-          }
-    }
-    var foo = 0.25 + 0.5*(count%2);  //light or dark gray
-    return new THREE.Vector3(foo, foo, foo);
-}
+var movedTowardsCentralCubeThisFrame = false;
 
 function loadStuff(){ 
   
@@ -111,7 +101,7 @@ function loadStuff(){
     for (var j = 0; j < numTiles; j++) {
       var i = j + numTiles*k;
       bigMatArray[i].uniforms['translation'].value = tsfms[j];
-      bigMatArray[i].uniforms['cellColor'].value = word2color( words[j] );
+      bigMatArray[i].uniforms['cellColorIndex'].value = word2colorIndex( words[j] );
 
 
     // bigMatArray[i].visible = phraseOnOffMaps[currentPhrase][k];
@@ -152,9 +142,17 @@ function init() {
         type: "m4",
         value: new THREE.Matrix4().set(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
       },
-      cellColor: {
-        type: "v3",
-        value: new THREE.Vector3(0.5,0.5,0.5)
+      // cellColor: {
+      //   type: "v3",
+      //   value: new THREE.Vector3(0.5,0.5,0.5)
+      // }
+      cellColorIndex: {
+        type: "i",
+        value: 0
+      },
+      userCellColorIndex: {  // which index colour the user is in
+        type: "i",
+        value: 0
       }
     },
     vertexShader: document.getElementById('vertexShader').textContent,
@@ -188,18 +186,23 @@ function init() {
 
 
 function animate() {
+  controls.update();  // need to get movedTowardsCentralCubeThisFrame before updating stuff
+
   for (var k = 0; k < numObjects; k++) {
     for (var j = 0; j < numTiles; j++) {
       var i = j + numTiles*k;
       // bigMatArray[i].uniforms['translation'].value = tsfms[j];
       bigMatArray[i].uniforms['boost'].value = currentBoost;
+      if (movedTowardsCentralCubeThisFrame) {
+        bigMatArray[i].uniforms['userCellColorIndex'].value = 1 - bigMatArray[i].uniforms['userCellColorIndex'].value;
+      }
 
 
     // bigMatArray[i].visible = phraseOnOffMaps[currentPhrase][k];
     }
   }
 
-  controls.update();
+  
   effect.render(scene, camera);
   requestAnimationFrame(animate);
 }

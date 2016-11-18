@@ -43,7 +43,7 @@ rotzi.multiply( translateByVector(new THREE.Vector3(0,0,dist)) ),
 rotz.multiply( translateByVector(new THREE.Vector3(0,0,-dist)) )
 ];
 
-function word2color(word) {
+function word2colorIndex(word) {
     // word is a list of indexes into tilingGens
     var count = 0;
     for (var j = 0; j < word.length; j++){
@@ -51,7 +51,8 @@ function word2color(word) {
             count++;
           }
     }
-    var foo = 0.25 + 0.5*(count%2);  //light or dark gray
-    return new THREE.Vector3(foo, foo, foo);
+    // var foo = 0.25 + 0.5*(count%2);  //light or dark gray
+    // return new THREE.Vector3(foo, foo, foo);
+    return count % 2;
 }
 

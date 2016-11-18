@@ -44,8 +44,9 @@
     uniform float time; // global time in seconds
     uniform mat4 translation; // dodecahedral
     uniform mat4 boost;
-    uniform vec3 cellColor;
-
+    // uniform vec3 cellColor;
+    uniform int cellColorIndex; 
+    uniform int userCellColorIndex; 
 
     vec3 ChooseColor( in vec3 nBase )
     {
@@ -163,9 +164,12 @@
       n3sphere = projVecPerp(  n3sphere, p3sphere );
       n3sphere = quatMult( n3sphere, quatInv( p3sphere ) );
       n3sphere = normalize(n3sphere);
-      
-      vec3 col = 0.25*( HopfColor(n3sphere)-vec3(0.5,0.5,0.5) ) + cellColor;
-      // vec3 col = cellColor;
+
+      float colorIndex = mod(float(cellColorIndex + userCellColorIndex), 2.0); // glsl mod is weird
+
+      float c = 0.5 * float(colorIndex) + 0.25;
+
+      vec3 col = 0.25*( HopfColor(n3sphere)-vec3(0.5,0.5,0.5) ) + vec3(c,c,c);
       vColor = col;
 
       // base position
