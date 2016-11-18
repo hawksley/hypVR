@@ -40,6 +40,18 @@ var cumulativeNumTsfms = unpackTriple[2];
 var numTiles = tsfms.length;
 var bigMatArray = new Array(numObjects * numTiles);
 
+function word2color(word) {
+    // word is a list of indexes into tilingGens
+    var count = 0;
+    for (var j = 0; j < word.length; j++){
+        if (word[j] != 0){
+            count++;
+          }
+    }
+    var foo = 0.25 + 0.5*(count%2);  //light or dark gray
+    return new THREE.Vector3(foo, foo, foo);
+}
+
 function loadStuff(){ 
   
   var manager = new THREE.LoadingManager();
@@ -99,7 +111,8 @@ function loadStuff(){
     for (var j = 0; j < numTiles; j++) {
       var i = j + numTiles*k;
       bigMatArray[i].uniforms['translation'].value = tsfms[j];
-      // bigMatArray[i].uniforms['boost'].value = currentBoost;
+      bigMatArray[i].uniforms['cellColor'].value = word2color( words[j] );
+
 
     // bigMatArray[i].visible = phraseOnOffMaps[currentPhrase][k];
     }
@@ -138,6 +151,10 @@ function init() {
       boost: {
         type: "m4",
         value: new THREE.Matrix4().set(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+      },
+      cellColor: {
+        type: "v3",
+        value: new THREE.Vector3(0.5,0.5,0.5)
       }
     },
     vertexShader: document.getElementById('vertexShader').textContent,
@@ -176,6 +193,7 @@ function animate() {
       var i = j + numTiles*k;
       // bigMatArray[i].uniforms['translation'].value = tsfms[j];
       bigMatArray[i].uniforms['boost'].value = currentBoost;
+
 
     // bigMatArray[i].visible = phraseOnOffMaps[currentPhrase][k];
     }

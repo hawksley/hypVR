@@ -44,6 +44,7 @@
     uniform float time; // global time in seconds
     uniform mat4 translation; // dodecahedral
     uniform mat4 boost;
+    uniform vec3 cellColor;
 
 
     vec3 ChooseColor( in vec3 nBase )
@@ -162,7 +163,11 @@
       n3sphere = projVecPerp(  n3sphere, p3sphere );
       n3sphere = quatMult( n3sphere, quatInv( p3sphere ) );
       n3sphere = normalize(n3sphere);
-      vColor = HopfColor(n3sphere);
+      
+      vec3 col = 0.25*( HopfColor(n3sphere)-vec3(0.5,0.5,0.5) ) + cellColor;
+      // vec3 col = cellColor;
+      vColor = col;
+
       // base position
       // float scaling = meshScalingFactor( 0.523, 0.785 );
       float scaling = 0.57735;  /// {4,3,6}
