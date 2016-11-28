@@ -136,6 +136,10 @@ function init() {
         type: "f",
         value: 0.0
       },
+      globalZScaling: {
+        type: "f",
+        value: globalZScaling  // this variable set in the tiling file, e.g. 46H2xR.js
+      },
       translationR: { // float that shifts the object in R direction, set once per object
         type: "f",
         value: 0.0

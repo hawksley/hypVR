@@ -42,6 +42,7 @@
 
     // input
     uniform float time; // global time in seconds
+    uniform float globalZScaling;
     uniform float translationR;
     uniform mat4 translationH2; 
     uniform float boostR;
@@ -186,21 +187,19 @@
 
       // base position
       // float scaling = meshScalingFactor( 0.523, 0.785 );
-      float scaling = 0.57735;  /// {4,3,6}, or {4,6} for H2xR
+      float scaling = 0.57735;  /// {4,3,6}, or {4,6} for H2xR. 0.57735 = tanh(arccosh(sqrt(3/2)))
       // float scaling = 0.66874;  /// {5,3,4}
       // float scaling = 0.760072; /// {5,3,5}
       // float scaling = 0.619712;  /// {4,3,7}
 
-      float zScaling = 1.0; //just what looks reasonable, the aspect ratio gets crazy at distance
-
       // vec4 p = projectToHyperboloidH2xR( vec4(position.zyx * scaling, 1.0) ); //0.57735 = tanh(arccosh(sqrt(3/2)))
 
       vec3 temp;
-      temp.x = position.z * scaling;
+      temp.x = position.z * scaling;  
       temp.y = position.y * scaling;  /// ordering from obj to our coords is zyx->xyz
       temp.z = 1.0; 
 
-      vec3 pH2temp = projectToHyperboloidH2( temp ); //0.57735 = tanh(arccosh(sqrt(3/2)))
+      vec3 pH2temp = projectToHyperboloidH2( temp ); 
       vec4 pH2 = vec4(pH2temp.x, pH2temp.y, 0.0, pH2temp.z);
 
       // scale cube of (face center) rad 1 so it maps to correct cube in Klein model on w=1,
@@ -209,7 +208,7 @@
 
       pH2 = boostH2 * translationH2 * pH2;
       pH2 = (1.0/pH2.w) * pH2; //project to Klein model here
-      float pR = (boostR + translationR + position.x) * zScaling;
+      float pR = boostR + translationR + (position.x * globalZScaling);
       vec4 p = vec4(pH2.x, pH2.y, pR, 1.0); /// ordering from obj to our coords is zyx->xyz
 
       // take the final 3D position and project it onto the screen

@@ -10,6 +10,7 @@ function acosh(arg) {
 }
 
 var dist = 2*acosh( Math.sqrt(1.5) )  // 436 or 46 in H^2
+var globalZScaling = 0.3; //height of cubes relative to x,y dimensions
 
 var tilingGens =
 [
@@ -18,8 +19,8 @@ translateByVectorH2xR(new THREE.Vector3(dist,0,0)) ,
 translateByVectorH2xR(new THREE.Vector3(-dist,0,0)) ,
 translateByVectorH2xR(new THREE.Vector3(0,dist,0)) ,
 translateByVectorH2xR(new THREE.Vector3(0,-dist,0)) ,
-translateByVectorH2xR(new THREE.Vector3(0,0,2)) ,    // what should this dist be?
-translateByVectorH2xR(new THREE.Vector3(0,0,-2))     // relation to scaling of cube in indexH2xR?
+translateByVectorH2xR(new THREE.Vector3(0,0,2*globalZScaling)) ,    
+translateByVectorH2xR(new THREE.Vector3(0,0,-2*globalZScaling))     // related to scaling of cube in indexH2xR
 ];
 
 console.log('tilingGens')
