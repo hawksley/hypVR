@@ -13,7 +13,7 @@ function areSameTsfm(tsfm1, tsfm2) {
     if (Math.abs(tsfm1[0] - tsfm2[0]) > delta) {
         return false;
     }
-	for (var coord=2; coord<12; coord+=4) {  //look only at last column of the 3x3 matrix we actually care about: center of cell
+	for (var coord=3; coord<16; coord+=4) {  //look only at last column of the matrix: center of cell in H2
 		if (Math.abs(tsfm1[1].elements[coord] - tsfm2[1].elements[coord]) > delta) {
 			return false;
 		}
@@ -122,49 +122,6 @@ function makeTsfmsList( tilingGens, tilingDepth ) {
 //   return result;
 // }
 
-// function translateByVectorH2xR(v) { //// likely wrong... cross terms should exist?
-//   var dx = v.x;
-//   var dy = v.y;
-//   var dz = v.z;
-//   var len = Math.sqrt(dx*dx + dy*dy);
-//   if (len == 0)
-//   { // dx = dy = 0, just return the result already
-//       var result = new THREE.Matrix4().set(
-//       1, 0, 0, 0,
-//       0, 1, 0, 0,
-//       0, 0, 1, dz,
-//       0, 0, 0, 1);
-//       return result;
-//   }
-//   else
-//   {
-//       dx /= len;
-//       dy /= len;
-//       // dz /= len;
-//       var mH2 = new THREE.Matrix4().set(
-//         0, 0, 0, dx,
-//         0, 0, 0, dy,
-//         0, 0, 0, 0,
-//         dx,dy,0, 0);
-//       var mH2squared = new THREE.Matrix4().copy(mH2).multiply(mH2);
-//       var c1H2 = Math.sinh(len);
-//       var c2H2 = Math.cosh(len) - 1;
-//       mH2.multiplyScalar(c1H2);
-//       mH2squared.multiplyScalar(c2H2);
-//       var result = new THREE.Matrix4().identity();
-//       result.add(mH2);
-//       result.add(mH2squared);
-//       var mR = new THREE.Matrix4().set(
-//         0, 0, 0, 0,
-//         0, 0, 0, 0,
-//         0, 0, 0, dz,
-//         0, 0, 0, 0);
-//       result.add(mR);
-
-//       return result;
-//   }
-// }
-
 function translateByVectorH2xR(v) {  // return only H2 part for now
   var dx = v.x;
   var dy = v.y;
@@ -184,10 +141,10 @@ function translateByVectorH2xR(v) {  // return only H2 part for now
     dx /= len;
     dy /= len;
     var mH2 = new THREE.Matrix4().set(
-     0, 0, dx,0,
-     0, 0, dy,0,
-    dx,dy, 0, 0,
-     0, 0, 0, 0);
+     0, 0, 0,dx,
+     0, 0, 0,dy,
+     0, 0, 0, 0,
+    dx,dy, 0, 0);
     var mH2squared = new THREE.Matrix4().copy(mH2).multiply(mH2);
     var c1H2 = Math.sinh(len);
     var c2H2 = Math.cosh(len) - 1;

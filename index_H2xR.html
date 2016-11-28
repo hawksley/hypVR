@@ -201,14 +201,14 @@
       temp.z = 1.0; 
 
       vec3 pH2temp = projectToHyperboloidH2( temp ); //0.57735 = tanh(arccosh(sqrt(3/2)))
-      vec4 pH2 = vec4(pH2temp, 0.0);
+      vec4 pH2 = vec4(pH2temp.x, pH2temp.y, 0.0, pH2temp.z);
 
       // scale cube of (face center) rad 1 so it maps to correct cube in Klein model on w=1,
       // Klein model euclidean dist from 0 = tanh(hyp dist from 0)
 
 
       pH2 = boostH2 * translationH2 * pH2;
-      pH2 = (1.0/pH2.z) * pH2; //project to Klein model here
+      pH2 = (1.0/pH2.w) * pH2; //project to Klein model here
       float pR = (boostR + translationR + position.x) * zScaling;
       vec4 p = vec4(pH2.x, pH2.y, pR, 1.0); /// ordering from obj to our coords is zyx->xyz
 
