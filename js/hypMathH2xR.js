@@ -1,35 +1,32 @@
 //hyperbolic matrix functions
 
+// THREE.Matrix3.prototype.add = function (m) {
+//   this.set.apply(this, [].map.call(this.elements, function (c, i) { return c + m.elements[i] }));
+// };
+
 THREE.Matrix4.prototype.add = function (m) {
   this.set.apply(this, [].map.call(this.elements, function (c, i) { return c + m.elements[i] }));
 };
 
-// function areSameMatrix(mat1, mat2) {
-// 	var delta = 0.0001;
-// 	for (var coord=0; coord<16; coord++) {
-// 		if (Math.abs(mat1.elements[coord] - mat2.elements[coord]) > delta) {
-// 			return false;
-// 		}
-// 	}
-// 	return true;
-// }
-
-function areSameMatrix(mat1, mat2) {  //look only at last column - center of cell
-	var delta = 0.01;
-	for (var coord=3; coord<16; coord+=4) {
-		if (Math.abs(mat1.elements[coord] - mat2.elements[coord]) > delta) {
+function areSameTsfm(tsfm1, tsfm2) {
+	var delta = 0.001;
+    if (Math.abs(tsfm1[0] - tsfm2[0]) > delta) {
+        return false;
+    }
+	for (var coord=2; coord<12; coord+=4) {  //look only at last column of the 3x3 matrix we actually care about: center of cell
+		if (Math.abs(tsfm1[1].elements[coord] - tsfm2[1].elements[coord]) > delta) {
 			return false;
 		}
 	}
-	console.log('same matrix')
-	console.log(mat1.elements)
-	console.log(mat2.elements)
+    console.log('same tsfm');
+    console.log(tsfm1);
+    console.log(tsfm2);
 	return true;
 }
 
-function isMatrixInArray(mat, matArray) {
-	for (var i=0; i<matArray.length; i++) {
-		if (areSameMatrix(mat, matArray[i])) {
+function isTsfmInArray(tsfm, tsfmArray) {
+	for (var i=0; i<tsfmArray.length; i++) {
+		if (areSameTsfm(tsfm, tsfmArray[i])) {
 		// if (i > 3) {
 			return true;
 		}
@@ -71,12 +68,19 @@ function makeTsfmsList( tilingGens, tilingDepth ) {
 	      jcopy = (jcopy/numGens)|0;
 	    }
 	    console.log(digits);
-	    var newTsfm = new THREE.Matrix4();
+	    var newTsfmH2 = new THREE.Matrix4();
+        var newTsfmR = 0.0;
+        var newTsfm;
+
 	    for (var l = 0; l < tilingDepth; l++) {
-	      newTsfm = newTsfm.multiply(tilingGens[digits[l]]);
+          newTsfmR = newTsfmR + tilingGens[digits[l]][0];
+	      newTsfmH2 = newTsfmH2.multiply(tilingGens[digits[l]][1]);
+          newTsfm = [newTsfmR, newTsfmH2];
+          // console.log('newTsfmH2');
+          // console.log(newTsfmH2);
 	    }
 
-	    if ( !isMatrixInArray(newTsfm, tsfms) ) {
+	    if ( !isTsfmInArray(newTsfm, tsfms) ) {
 	      tsfms[tsfms.length] = newTsfm;
           words[words.length] = digits;
 	      numTsfmsEachDepth[digitsDepth(digits)] += 1;
@@ -89,53 +93,134 @@ function makeTsfmsList( tilingGens, tilingDepth ) {
 			cumulativeNumTsfms[i] += cumulativeNumTsfms[i-1];
 		}
 	}
+    console.log('tsfms');
+    console.log(tsfms);
 	return [tsfms, words, cumulativeNumTsfms];
 }
 
-function translateByVector(v) { // trickery stolen from Jeff Weeks' Curved Spaces app
+// function translateByVector(v) { // trickery stolen from Jeff Weeks' Curved Spaces app
+//   var dx = v.x;
+//   var dy = v.y;
+//   var dz = v.z;
+//   var len = Math.sqrt(dx*dx + dy*dy + dz*dz);
+//   dx /= len;
+//   dy /= len;
+//   dz /= len;
+//   var m = new THREE.Matrix4().set(
+//     0, 0, 0, dx,
+//     0, 0, 0, dy,
+//     0, 0, 0, dz,
+//     dx,dy,dz, 0);
+//   var m2 = new THREE.Matrix4().copy(m).multiply(m);
+//   var c1 = Math.sinh(len);
+//   var c2 = Math.cosh(len) - 1;
+//   m.multiplyScalar(c1);
+//   m2.multiplyScalar(c2);
+//   var result = new THREE.Matrix4().identity();
+//   result.add(m);
+//   result.add(m2);
+//   return result;
+// }
+
+// function translateByVectorH2xR(v) { //// likely wrong... cross terms should exist?
+//   var dx = v.x;
+//   var dy = v.y;
+//   var dz = v.z;
+//   var len = Math.sqrt(dx*dx + dy*dy);
+//   if (len == 0)
+//   { // dx = dy = 0, just return the result already
+//       var result = new THREE.Matrix4().set(
+//       1, 0, 0, 0,
+//       0, 1, 0, 0,
+//       0, 0, 1, dz,
+//       0, 0, 0, 1);
+//       return result;
+//   }
+//   else
+//   {
+//       dx /= len;
+//       dy /= len;
+//       // dz /= len;
+//       var mH2 = new THREE.Matrix4().set(
+//         0, 0, 0, dx,
+//         0, 0, 0, dy,
+//         0, 0, 0, 0,
+//         dx,dy,0, 0);
+//       var mH2squared = new THREE.Matrix4().copy(mH2).multiply(mH2);
+//       var c1H2 = Math.sinh(len);
+//       var c2H2 = Math.cosh(len) - 1;
+//       mH2.multiplyScalar(c1H2);
+//       mH2squared.multiplyScalar(c2H2);
+//       var result = new THREE.Matrix4().identity();
+//       result.add(mH2);
+//       result.add(mH2squared);
+//       var mR = new THREE.Matrix4().set(
+//         0, 0, 0, 0,
+//         0, 0, 0, 0,
+//         0, 0, 0, dz,
+//         0, 0, 0, 0);
+//       result.add(mR);
+
+//       return result;
+//   }
+// }
+
+function translateByVectorH2xR(v) {  // return only H2 part for now
   var dx = v.x;
   var dy = v.y;
   var dz = v.z;
-  var len = Math.sqrt(dx*dx + dy*dy + dz*dz);
-  dx /= len;
-  dy /= len;
-  dz /= len;
-  var m = new THREE.Matrix4().set(
-    0, 0, 0, dx,
-    0, 0, 0, dy,
-    0, 0, 0, dz,
-    dx,dy,dz, 0);
-  var m2 = new THREE.Matrix4().copy(m).multiply(m);
-  var c1 = Math.sinh(len);
-  var c2 = Math.cosh(len) - 1;
-  m.multiplyScalar(c1);
-  m2.multiplyScalar(c2);
-  var result = new THREE.Matrix4().identity();
-  result.add(m);
-  result.add(m2);
-  return result;
+  var len = Math.sqrt(dx*dx + dy*dy);
+  if (len == 0)
+  { // dx = dy = 0, just return the result already
+    var resultH2 = new THREE.Matrix4().set(   //THREE.js doesn't have proper support for matrix3s, so just ignore the 4th coord
+    1, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, 1, 0,
+    0, 0, 0, 1);
+    return [dz, resultH2];
+  }
+  else
+  {
+    dx /= len;
+    dy /= len;
+    var mH2 = new THREE.Matrix4().set(
+     0, 0, dx,0,
+     0, 0, dy,0,
+    dx,dy, 0, 0,
+     0, 0, 0, 0);
+    var mH2squared = new THREE.Matrix4().copy(mH2).multiply(mH2);
+    var c1H2 = Math.sinh(len);
+    var c2H2 = Math.cosh(len) - 1;
+    mH2.multiplyScalar(c1H2);
+    mH2squared.multiplyScalar(c2H2);
+    var resultH2 = new THREE.Matrix4().identity();
+    resultH2.add(mH2);
+    resultH2.add(mH2squared);
+
+    return [dz, resultH2];  //float for R direction, 4x4 of which only first 3x3 is used for H2 direction
+  }
 }
 
-function parabolicBy2DVector(v) {  ///  something is wrong here we think...
-  var dx = v.x; /// first make parabolic fixing point at infinity in pos z direction
-  var dy = v.y;
-  var m = new THREE.Matrix4().set(
-    0, 0, -dx, dx,
-    0, 0, -dy, dy,
-    dx, dy, 0, 0,
-    dx, dy, 0, 0);
-  var m2 = new THREE.Matrix4().copy(m).multiply(m);
-  m2.multiplyScalar(0.5);
-  var result = new THREE.Matrix4().identity();
-  result.add(m);
-  result.add(m2);
-  //now conjugate to get based on camera orientation  
-  var cameraM = new THREE.Matrix4();
-  cameraM.makeRotationFromQuaternion(camera.quaternion);
-  var cameraMinv = new THREE.Matrix4().getInverse(cameraM);
+// function parabolicBy2DVector(v) {  ///  something is wrong here we think...
+//   var dx = v.x; /// first make parabolic fixing point at infinity in pos z direction
+//   var dy = v.y;
+//   var m = new THREE.Matrix4().set(
+//     0, 0, -dx, dx,
+//     0, 0, -dy, dy,
+//     dx, dy, 0, 0,
+//     dx, dy, 0, 0);
+//   var m2 = new THREE.Matrix4().copy(m).multiply(m);
+//   m2.multiplyScalar(0.5);
+//   var result = new THREE.Matrix4().identity();
+//   result.add(m);
+//   result.add(m2);
+//   //now conjugate to get based on camera orientation  
+//   var cameraM = new THREE.Matrix4();
+//   cameraM.makeRotationFromQuaternion(camera.quaternion);
+//   var cameraMinv = new THREE.Matrix4().getInverse(cameraM);
 
-  return cameraM.multiply(result).multiply(cameraMinv);
-}
+//   return cameraM.multiply(result).multiply(cameraMinv);
+// }
 
 function getFwdVector() {
   return new THREE.Vector3(0,0,1).applyQuaternion(camera.quaternion);
@@ -216,6 +301,8 @@ function fastGramSchmidt( m )
 
 ///// better GramSchmidt...seem more stable out near infinity
 
+///should really fix for H2xR, but have to decompose m, gram schmidt hyperbolic part, and recompose
+
 function lorentzDot( u, v ){
 	return u[0]*v[0] + u[1]*v[1] + u[2]*v[2] - u[3]*v[3];
 }
@@ -250,11 +337,11 @@ function fakeDist( v ){  //good enough for comparison of distances on the hyperb
 
 function fixOutsideCentralCell( mat, gens ) {
 	//assume first in Gens is identity, should probably fix when we get a proper list of matrices
-	var cPos = new THREE.Vector4(0,0,0,1).applyMatrix4( mat ); //central
+	var cPos = new THREE.Vector3(0,0,1,0).applyMatrix4( mat ); //central
 	var bestDist = fakeDist(cPos);
 	var bestIndex = 0;
 	for (var i=1; i < gens.length; i++){  
-		pos = new THREE.Vector4(0,0,0,1).applyMatrix4( gens[i] ).applyMatrix4( mat );
+		pos = new THREE.Vector4(0,0,1,0).applyMatrix4( gens[i] ).applyMatrix4( mat );
 		if (fakeDist(pos) < bestDist) {
 			bestDist = fakeDist(pos);
 			bestIndex = i;

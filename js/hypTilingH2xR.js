@@ -10,7 +10,8 @@ var controls;
 var clicky = 0;
 var mouseX = 1;
 var mouseY = 1;
-var currentBoost = new THREE.Matrix4().set(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
+var currentBoostR = 0.0;
+var currentBoostH2 = new THREE.Matrix4().set(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
 
 var decorationArray = [
   'monkey', 
@@ -38,7 +39,7 @@ var words = unpackTriple[1];
 var cumulativeNumTsfms = unpackTriple[2];
 
 var numTiles = tsfms.length;
-var bigMatArray = new Array(numObjects * numTiles);
+var bigTsfmArray = new Array(numObjects * numTiles);
 
 var movedTowardsCentralCubeThisFrame = false;
 
@@ -52,7 +53,7 @@ function loadStuff(){
     loader.load('media/monkey_7.5k_tris.obj', function (object) {
       for (var i = 0; i < cumulativeNumTsfms[1]; i++) {
         var newObject = object.clone();
-        newObject.children[0].material = bigMatArray[(i)];
+        newObject.children[0].material = bigTsfmArray[(i)];
         // newObject.children[0].frustumCulled = false;
         scene.add(newObject);
       }
@@ -61,7 +62,7 @@ function loadStuff(){
       loader.load('media/monkey_3k_tris.obj', function (object) {
       for (var i = cumulativeNumTsfms[1]; i < cumulativeNumTsfms[2]; i++) {
         var newObject = object.clone();
-        newObject.children[0].material = bigMatArray[(i)];
+        newObject.children[0].material = bigTsfmArray[(i)];
         // newObject.children[0].frustumCulled = false;
         scene.add(newObject);
       }
@@ -70,7 +71,7 @@ function loadStuff(){
       loader.load('media/monkey_250_tris.obj', function (object) {
       for (var i = cumulativeNumTsfms[2]; i < cumulativeNumTsfms[3]; i++) {
         var newObject = object.clone();
-        newObject.children[0].material = bigMatArray[(i)];
+        newObject.children[0].material = bigTsfmArray[(i)];
         // newObject.children[0].frustumCulled = false;
         scene.add(newObject);
       }
@@ -79,7 +80,7 @@ function loadStuff(){
       loader.load('media/monkey_150_tris.obj', function (object) {
       for (var i = cumulativeNumTsfms[3]; i < numTiles; i++) {
         var newObject = object.clone();
-        newObject.children[0].material = bigMatArray[(i)];
+        newObject.children[0].material = bigTsfmArray[(i)];
         // newObject.children[0].frustumCulled = false;
         scene.add(newObject);
       }
@@ -91,7 +92,7 @@ function loadStuff(){
       loader.load('media/'.concat(decoration, '.obj'), function (object) {
       for (var i = 0; i < numTiles; i++) {
         var newObject = object.clone();
-        newObject.children[0].material = bigMatArray[(i)];
+        newObject.children[0].material = bigTsfmArray[(i)];
         // newObject.children[0].frustumCulled = false;
         scene.add(newObject);
       }
@@ -100,11 +101,12 @@ function loadStuff(){
   for (var k = 0; k < numObjects; k++) {
     for (var j = 0; j < numTiles; j++) {
       var i = j + numTiles*k;
-      bigMatArray[i].uniforms['translation'].value = tsfms[j];
-      bigMatArray[i].uniforms['cellColorIndex'].value = word2colorIndex( words[j] );
+      bigTsfmArray[i].uniforms['translationR'].value = tsfms[j][0];
+      bigTsfmArray[i].uniforms['translationH2'].value = tsfms[j][1];
+      bigTsfmArray[i].uniforms['cellColorIndex'].value = word2colorIndex( words[j] );
 
 
-    // bigMatArray[i].visible = phraseOnOffMaps[currentPhrase][k];
+    // bigTsfmArray[i].visible = phraseOnOffMaps[currentPhrase][k];
     }
   }
 
@@ -134,11 +136,19 @@ function init() {
         type: "f",
         value: 0.0
       },
-      translation: { // quaternion that moves shifts the object, set once per object
+      translationR: { // float that shifts the object in R direction, set once per object
+        type: "f",
+        value: 0.0
+      },
+      translationH2: { // matrix that shifts the object in H2 direction, set once per object
         type: "m4",
         value: new THREE.Matrix4().set(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
       },
-      boost: {
+      boostR: { 
+        type: "f",
+        value: 0.0
+      },
+      boostH2: {
         type: "m4",
         value: new THREE.Matrix4().set(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
       },
@@ -164,8 +174,8 @@ function init() {
   }
 
   // one material per object, since they have a different positions
-  for (var i = 0; i < bigMatArray.length; i++) {
-    bigMatArray[i] = materialBase.clone();
+  for (var i = 0; i < bigTsfmArray.length; i++) {
+    bigTsfmArray[i] = materialBase.clone();
   }
 
   loadStuff();
@@ -191,14 +201,14 @@ function animate() {
   for (var k = 0; k < numObjects; k++) {
     for (var j = 0; j < numTiles; j++) {
       var i = j + numTiles*k;
-      // bigMatArray[i].uniforms['translation'].value = tsfms[j];
-      bigMatArray[i].uniforms['boost'].value = currentBoost;
+      bigTsfmArray[i].uniforms['boostR'].value = currentBoostR;
+      bigTsfmArray[i].uniforms['boostH2'].value = currentBoostH2;
       if (movedTowardsCentralCubeThisFrame) {
-        bigMatArray[i].uniforms['userCellColorIndex'].value = 1 - bigMatArray[i].uniforms['userCellColorIndex'].value;
+        bigTsfmArray[i].uniforms['userCellColorIndex'].value = 1 - bigTsfmArray[i].uniforms['userCellColorIndex'].value;
       }
 
 
-    // bigMatArray[i].visible = phraseOnOffMaps[currentPhrase][k];
+    // bigTsfmArray[i].visible = phraseOnOffMaps[currentPhrase][k];
     }
   }
 
