@@ -123,16 +123,19 @@ THREE.VRControls = function ( camera, done ) {
 		// }
 
 		//if outside central cell, move back
-		// if (fixOutside){
-		// 	movedTowardsCentralCubeThisFrame = fixOutsideCentralCell( currentBoostH2, tilingGens );
-		// }
+		if (fixOutside){
+			 var triple = fixOutsideCentralCellH2xR( currentBoostR, currentBoostH2, tilingGens );
+             movedTowardsCentralCubeThisFrame = triple[0];
+             currentBoostR = triple[1];
+             currentBoostH2 = triple[2];
+		}
 
 		//run to avoid error accumulation
 
 		// currentBoost.elements = fastGramSchmidt( currentBoost.elements );
 
-        // turn off for now, need H2xR version
-		//currentBoost.elements = gramSchmidt( currentBoost.elements ); //seems more stable near infinity
+        // this works for the H2 part of H2xR also, don't need gramSchmidt for the R part
+		currentBoostH2.elements = gramSchmidt( currentBoostH2.elements ); //seems more stable near infinity
 
 
 	  var update = new THREE.Quaternion(this.manualRotateRate[0] * 0.2 * interval,
@@ -253,7 +256,11 @@ function onkey(event) {
   } else if (event.keyCode == 84) {
   	fixOutside = !fixOutside;
   }	else if (event.keyCode == 82) {
-  	fixOutsideCentralCell( [currentBoostR, currentBoostH2], tilingGens );
+  	//fixOutsideCentralCell( currentBoostR, currentBoostH2, tilingGens );
+    var triple = fixOutsideCentralCellH2xR( currentBoostR, currentBoostH2, tilingGens );
+    movedTowardsCentralCubeThisFrame = triple[0];
+    currentBoostR = triple[1];
+    currentBoostH2 = triple[2];
   }	  
 }
 

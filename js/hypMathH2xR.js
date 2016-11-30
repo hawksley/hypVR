@@ -18,9 +18,9 @@ function areSameTsfm(tsfm1, tsfm2) {
 			return false;
 		}
 	}
-    console.log('same tsfm');
-    console.log(tsfm1);
-    console.log(tsfm2);
+    // console.log('same tsfm');
+    // console.log(tsfm1);
+    // console.log(tsfm2);
 	return true;
 }
 
@@ -67,7 +67,7 @@ function makeTsfmsList( tilingGens, tilingDepth ) {
 	      digits[digits.length] = jcopy % numGens;
 	      jcopy = (jcopy/numGens)|0;
 	    }
-	    console.log(digits);
+	    // console.log(digits);
 	    var newTsfmH2 = new THREE.Matrix4();
         var newTsfmR = 0.0;
         var newTsfm;
@@ -288,31 +288,61 @@ function gramSchmidt( m ){
 
 ////////check if we are still inside the central fund dom...
 
-function fakeDist( v ){  //good enough for comparison of distances on the hyperboloid
-	return v.x*v.x + v.y*v.y + v.z*v.z;
+// function fakeDist( v ){  //good enough for comparison of distances on the hyperboloid
+// 	return v.x*v.x + v.y*v.y + v.z*v.z;
+// }
+
+// function fixOutsideCentralCell( mat, gens ) {
+// 	//assume first in Gens is identity, should probably fix when we get a proper list of matrices
+// 	var cPos = new THREE.Vector4(0,0,0,1).applyMatrix4( mat ); //central
+// 	var bestDist = fakeDist(cPos);
+// 	var bestIndex = 0;
+// 	for (var i=1; i < gens.length; i++){  
+// 		pos = new THREE.Vector4(0,0,1,0).applyMatrix4( gens[i] ).applyMatrix4( mat );
+// 		if (fakeDist(pos) < bestDist) {
+// 			bestDist = fakeDist(pos);
+// 			bestIndex = i;
+// 		}
+// 	}
+// 	if (bestIndex != 0){
+// 		mat = mat.multiply(gens[bestIndex]);
+//         return true;
+// 	}			
+//     else {
+//         return false;
+//     }
+// }
+
+function fakeDistH2xR( vH2, vR ){  //good enough for comparison of distances on the hyperboloid
+    return vH2.x*vH2.x + vH2.y*vH2.y + vR*vR;
 }
 
-function fixOutsideCentralCell( mat, gens ) {
-	//assume first in Gens is identity, should probably fix when we get a proper list of matrices
-	var cPos = new THREE.Vector3(0,0,1,0).applyMatrix4( mat ); //central
-	var bestDist = fakeDist(cPos);
-	var bestIndex = 0;
-	for (var i=1; i < gens.length; i++){  
-		pos = new THREE.Vector4(0,0,1,0).applyMatrix4( gens[i] ).applyMatrix4( mat );
-		if (fakeDist(pos) < bestDist) {
-			bestDist = fakeDist(pos);
-			bestIndex = i;
-		}
-	}
-	if (bestIndex != 0){
-		mat = mat.multiply(gens[bestIndex]);
-        return true;
-	}			
+function fixOutsideCentralCellH2xR( tsfmR, tsfmH2, gens ) {
+    //assume first in Gens is identity, should probably fix when we get a proper list of matrices
+    var cPosR = tsfmR;
+    var cPosH2 = new THREE.Vector4(0,0,0,1).applyMatrix4( tsfmH2 ); //central
+    var bestDist = fakeDistH2xR(cPosH2, cPosR);
+    var bestIndex = 0;
+    for (var i=1; i < gens.length; i++){  
+        posR = gens[i][0] + cPosR;
+        posH2 = new THREE.Vector4(0,0,0,1).applyMatrix4( gens[i][1] ).applyMatrix4( tsfmH2 );
+        if (fakeDistH2xR(posH2, posR) < bestDist) {
+            bestDist = fakeDistH2xR(posH2, posR);
+            bestIndex = i;
+        }
+    }
+    if (bestIndex != 0){
+        tsfmR = tsfmR + gens[bestIndex][0];
+        tsfmH2.multiply(gens[bestIndex][1]);
+
+        // console.log(tsfm[1].multiply(gens[bestIndex][1]));
+        // tsfm = [ tsfm[0] + gens[bestIndex][0], tsfm[1].multiply(gens[bestIndex][1]) ];
+        // console.log(tsfm[1]);
+        return [true, tsfmR, tsfmH2];
+    }           
     else {
-        return false;
+        return [false, tsfmR, tsfmH2];
     }
 }
-
-
 
 
