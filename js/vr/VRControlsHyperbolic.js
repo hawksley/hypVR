@@ -242,9 +242,9 @@ function onkey(event) {
   } else if (event.keyCode == 86 || event.keyCode == 13 || event.keyCode == 32 ) { // v or 'enter' or 'space' for VR mode
     vrMode = !vrMode;
     effect.setVRMode(vrMode);
-  } else if (event.keyCode == 84) {
+  } else if (event.keyCode == 84) { // t
   	fixOutside = !fixOutside;
-  }	else if (event.keyCode == 82) {
+  }	else if (event.keyCode == 82) { // r
   	fixOutsideCentralCell( currentBoost, tilingGens );
   }	  
 }
