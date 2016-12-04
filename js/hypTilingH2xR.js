@@ -104,7 +104,8 @@ function loadStuff(){
       bigTsfmArray[i].uniforms['translationR'].value = tsfms[j][0];
       bigTsfmArray[i].uniforms['translationH2'].value = tsfms[j][1];
       bigTsfmArray[i].uniforms['cellColorIndex'].value = word2colorIndex( words[j] );
-
+      bigTsfmArray[i].uniforms['globalZScaling'].value = globalZScaling;
+      bigTsfmArray[i].uniforms['globalCoordChange'].value = globalCoordChange;
 
     // bigTsfmArray[i].visible = phraseOnOffMaps[currentPhrase][k];
     }
@@ -138,7 +139,11 @@ function init() {
       },
       globalZScaling: {
         type: "f",
-        value: globalZScaling  // this variable set in the tiling file, e.g. 46H2xR.js
+        value: 1.0  // this variable set in the tiling file, e.g. 46H2xR.js
+      },
+      globalCoordChange: {
+        type: "m4",
+        value: new THREE.Matrix4().set(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
       },
       translationR: { // float that shifts the object in R direction, set once per object
         type: "f",

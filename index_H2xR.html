@@ -43,6 +43,7 @@
     // input
     uniform float time; // global time in seconds
     uniform float globalZScaling;
+    uniform mat4 globalCoordChange;
     uniform float translationR;
     uniform mat4 translationH2; 
     uniform float boostR;
@@ -213,7 +214,7 @@
 
       // take the final 3D position and project it onto the screen
 
-      gl_Position = projectionMatrix * modelViewMatrix * p;
+      gl_Position = projectionMatrix * modelViewMatrix * globalCoordChange * p; //globalCoordChange for making the R direction be up on screen
     }
   </script>
 

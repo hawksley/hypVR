@@ -103,6 +103,7 @@ THREE.VRControls = function ( camera, done ) {
 
 		}
 		if (offset !== undefined) {
+            offset.applyMatrix4(globalCoordChangeInv); //for making the R direction be up on screen
 			m = translateByVectorH2xR(offset);
             mR = m[0];
             mH2 = m[1];

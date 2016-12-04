@@ -12,6 +12,15 @@ function acosh(arg) {
 var dist = 2*acosh( Math.sqrt(1.5) )  // 436 or 46 in H^2
 var globalZScaling = 0.3; //height of cubes relative to x,y dimensions
 
+var globalCoordChange = new THREE.Matrix4().set(   
+    0, 1, 0, 0,
+    0, 0, 1, 0, //rotate so that R is in vertical dir on screen
+    1, 0, 0, 0,
+    0, 0, 0, 1);
+
+var globalCoordChangeInv = new THREE.Matrix4();
+globalCoordChangeInv.getInverse(globalCoordChange);
+
 var tilingGens =
 [
 [0, new THREE.Matrix4()],  //[0, id matrix]
