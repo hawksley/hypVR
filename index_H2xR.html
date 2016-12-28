@@ -123,6 +123,12 @@
         return vec3(r*0.5 + 0.5,g*0.5 + 0.5,b*0.5 + 0.5);
     }
 
+    float tanh( in float z )
+    {
+      float Z = exp(2.0*z);
+      return (Z - 1.0) / (Z + 1.0);
+    }
+
     // output
     varying vec3 vColor; // this shader computes the color of each vertex
 
@@ -210,7 +216,8 @@
       pH2 = boostH2 * translationH2 * pH2;
       pH2 = (1.0/pH2.w) * pH2; //project to Klein model here
       float pR = boostR + translationR + (position.x * globalZScaling);
-      vec4 p = vec4(pH2.x, pH2.y, pR, 1.0); /// ordering from obj to our coords is zyx->xyz
+      vec4 p = vec4(pH2.x, pH2.y, tanh(pR), 1.0); /// ordering from obj to our coords is zyx->xyz
+      // tanh treats the R coord like H^1
 
       // take the final 3D position and project it onto the screen
 
