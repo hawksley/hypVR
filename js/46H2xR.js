@@ -10,7 +10,9 @@ function acosh(arg) {
 }
 
 var dist = 2*acosh( Math.sqrt(1.5) )  // 436 or 46 in H^2
-var globalZScaling = 0.3; //height of cubes relative to x,y dimensions
+// var globalZScaling = 0.3; //height of cubes relative to x,y dimensions
+
+var globalZScaling = 0.57735;
 
 var globalCoordChange = new THREE.Matrix4().set(   
     0, 1, 0, 0,
