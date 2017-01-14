@@ -43,16 +43,39 @@ rotzi.multiply( translateByVector(new THREE.Vector3(0,0,dist)) ),
 rotz.multiply( translateByVector(new THREE.Vector3(0,0,-dist)) )
 ];
 
-function word2colorIndex(word) {
+
+//// 2 colours
+// var genQuats = 
+// [
+// new THREE.Quaternion(0,0,0,1),
+// new THREE.Quaternion(0,0,0,-1),
+// new THREE.Quaternion(0,0,0,-1),
+// new THREE.Quaternion(0,0,0,-1),
+// new THREE.Quaternion(0,0,0,-1),
+// new THREE.Quaternion(0,0,0,-1),
+// new THREE.Quaternion(0,0,0,-1)
+// ];
+
+//// 8 colours
+var genQuats = 
+[
+new THREE.Quaternion(0,0,0,1),
+new THREE.Quaternion(1,0,0,0),
+new THREE.Quaternion(-1,0,0,0),
+new THREE.Quaternion(0,1,0,0),
+new THREE.Quaternion(0,-1,0,0),
+new THREE.Quaternion(0,0,1,0),
+new THREE.Quaternion(0,0,-1,0)
+];
+
+function word2colorQuat(word) {
     // word is a list of indexes into tilingGens
-    var count = 0;
+    var quat = new THREE.Quaternion(0,0,0,1);
     for (var j = 0; j < word.length; j++){
-        if (word[j] != 0){
-            count++;
-          }
+        quat.multiply( genQuats[word[j]] )   
     }
-    // var foo = 0.25 + 0.5*(count%2);  //light or dark gray
-    // return new THREE.Vector3(foo, foo, foo);
-    return count % 2;
+    return quat;
 }
+
+
 

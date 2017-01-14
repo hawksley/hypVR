@@ -101,7 +101,9 @@ function loadStuff(){
     for (var j = 0; j < numTiles; j++) {
       var i = j + numTiles*k;
       bigMatArray[i].uniforms['translation'].value = tsfms[j];
-      bigMatArray[i].uniforms['cellColorIndex'].value = word2colorIndex( words[j] );
+      bigMatArray[i].uniforms['cellColorQuat'].value = word2colorQuat( words[j] );
+      // console.log(words[j]);
+      // console.log(word2colorQuat( words[j] ));
 
 
     // bigMatArray[i].visible = phraseOnOffMaps[currentPhrase][k];
@@ -146,13 +148,13 @@ function init() {
       //   type: "v3",
       //   value: new THREE.Vector3(0.5,0.5,0.5)
       // }
-      cellColorIndex: {
-        type: "i",
-        value: 0
+      cellColorQuat: {
+        type: "v4",
+        value: new THREE.Quaternion( 0,0,0,1 )
       },
-      userCellColorIndex: {  // which index colour the user is in
-        type: "i",
-        value: 0
+      userCellColorQuat: {  // which index colour the user is in
+        type: "v4",
+        value: new THREE.Quaternion( 0,0,0,1 )
       }
     },
     vertexShader: document.getElementById('vertexShader').textContent,
@@ -186,15 +188,16 @@ function init() {
 
 
 function animate() {
-  controls.update();  // need to get movedTowardsCentralCubeThisFrame before updating stuff
+  controls.update();  // need to get movedTowardsCentralCubeThisFrameIndex before updating stuff
 
   for (var k = 0; k < numObjects; k++) {
     for (var j = 0; j < numTiles; j++) {
       var i = j + numTiles*k;
       // bigMatArray[i].uniforms['translation'].value = tsfms[j];
       bigMatArray[i].uniforms['boost'].value = currentBoost;
-      if (movedTowardsCentralCubeThisFrame) {
-        bigMatArray[i].uniforms['userCellColorIndex'].value = 1 - bigMatArray[i].uniforms['userCellColorIndex'].value;
+      if (movedTowardsCentralCubeThisFrameIndex != false) {
+
+        bigMatArray[i].uniforms['userCellColorQuat'].value.multiply(genQuats[movedTowardsCentralCubeThisFrameIndex]);
       }
 
 
