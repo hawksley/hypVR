@@ -246,7 +246,7 @@ function onkey(event) {
   	fixOutside = !fixOutside;
   }	else if (event.keyCode == 82) { // r
   	fixOutsideCentralCell( currentBoost, tilingGens );
-  }	  
+  }	 
 }
 
 window.addEventListener("keydown", onkey, true);

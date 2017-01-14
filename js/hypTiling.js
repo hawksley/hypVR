@@ -25,6 +25,7 @@ var decorationArray = [
   ];
 
 var decoration = "truncatedCube";
+var colourMode = 0;
 
 var doubleSided = false;
 
@@ -40,7 +41,7 @@ var cumulativeNumTsfms = unpackTriple[2];
 var numTiles = tsfms.length;
 var bigMatArray = new Array(numObjects * numTiles);
 
-var movedTowardsCentralCubeThisFrame = false;
+var movedTowardsCentralCubeThisFrameIndex = false;
 
 function loadStuff(){ 
   
@@ -104,13 +105,12 @@ function loadStuff(){
       bigMatArray[i].uniforms['cellColorQuat'].value = word2colorQuat( words[j] );
       // console.log(words[j]);
       // console.log(word2colorQuat( words[j] ));
+      // console.log(bigMatArray[i].uniforms['userCellColorQuat'].value);
 
 
     // bigMatArray[i].visible = phraseOnOffMaps[currentPhrase][k];
     }
   }
-
-
 } 
 
 
@@ -144,10 +144,6 @@ function init() {
         type: "m4",
         value: new THREE.Matrix4().set(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
       },
-      // cellColor: {
-      //   type: "v3",
-      //   value: new THREE.Vector3(0.5,0.5,0.5)
-      // }
       cellColorQuat: {
         type: "v4",
         value: new THREE.Quaternion( 0,0,0,1 )
@@ -190,21 +186,31 @@ function init() {
 function animate() {
   controls.update();  // need to get movedTowardsCentralCubeThisFrameIndex before updating stuff
 
+
   for (var k = 0; k < numObjects; k++) {
     for (var j = 0; j < numTiles; j++) {
       var i = j + numTiles*k;
-      // bigMatArray[i].uniforms['translation'].value = tsfms[j];
       bigMatArray[i].uniforms['boost'].value = currentBoost;
+      // console.log(bigMatArray[i].uniforms['userCellColorQuat'].value);
       if (movedTowardsCentralCubeThisFrameIndex != false) {
+        
+        var tempQuat = new THREE.Quaternion();
+        tempQuat.copy(bigMatArray[i].uniforms['userCellColorQuat'].value);
+        tempQuat.multiply(genQuatsColourSchemes[colourMode][movedTowardsCentralCubeThisFrameIndex]);      
 
-        bigMatArray[i].uniforms['userCellColorQuat'].value.multiply(genQuats[movedTowardsCentralCubeThisFrameIndex]);
+        bigMatArray[i].uniforms['userCellColorQuat'].value = tempQuat;
+        /// always act on a uniform by setting it equal to something, other stuff breaks in incomprehensible ways...
+
+
+        // console.log(movedTowardsCentralCubeThisFrameIndex);
+        // console.log(genQuats[movedTowardsCentralCubeThisFrameIndex]);
+        // console.log(bigMatArray[i].uniforms['userCellColorQuat'].value);
       }
 
 
     // bigMatArray[i].visible = phraseOnOffMaps[currentPhrase][k];
     }
   }
-
   
   effect.render(scene, camera);
   requestAnimationFrame(animate);
@@ -227,6 +233,22 @@ function selectShape(event) {
   }
 }
 
+document.addEventListener('keydown', function(event) { changeColourMode(event); }, false);
+
+function changeColourMode(event) {
+
+  var keySelect = event.keyCode; 
+
+  if (keySelect == 67){  //c
+     if (scene) {
+       while (scene.children.length > 0) {
+           scene.remove(scene.children[scene.children.length - 1]);
+       }
+    colourMode = (colourMode + 1) % genQuatsColourSchemes.length;
+    loadStuff();
+    }
+  }
+}
 
 init();
 animate();
