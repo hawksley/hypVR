@@ -51,7 +51,7 @@ function loadStuff(){
   
   if (decoration == "monkey"){
 
-    loader.load('media/monkey_7.5k_tris.obj', function (object) {
+    loader.load('media/euc_monkey_cut_7p5k.obj', function (object) {
       for (var i = 0; i < cumulativeNumTsfms[1]; i++) {
         var newObject = object.clone();
         newObject.children[0].material = bigTsfmArray[(i)];
@@ -60,7 +60,7 @@ function loadStuff(){
       }
     });
 
-      loader.load('media/monkey_3k_tris.obj', function (object) {
+      loader.load('media/euc_monkey_cut_3k.obj', function (object) {
       for (var i = cumulativeNumTsfms[1]; i < cumulativeNumTsfms[2]; i++) {
         var newObject = object.clone();
         newObject.children[0].material = bigTsfmArray[(i)];
@@ -69,7 +69,7 @@ function loadStuff(){
       }
     });
 
-      loader.load('media/monkey_250_tris.obj', function (object) {
+      loader.load('media/euc_monkey_cut_1p5k.obj', function (object) {
       for (var i = cumulativeNumTsfms[2]; i < cumulativeNumTsfms[3]; i++) {
         var newObject = object.clone();
         newObject.children[0].material = bigTsfmArray[(i)];
@@ -78,7 +78,7 @@ function loadStuff(){
       }
     });
 
-      loader.load('media/monkey_150_tris.obj', function (object) {
+      loader.load('media/monkey_750_tris.obj', function (object) {
       for (var i = cumulativeNumTsfms[3]; i < numTiles; i++) {
         var newObject = object.clone();
         newObject.children[0].material = bigTsfmArray[(i)];
