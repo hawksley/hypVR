@@ -26,6 +26,7 @@ var decorationArray = [
   ];
 
 var decoration = "truncatedCube";
+var colourMode = 0;
 
 var doubleSided = false;
 
@@ -41,7 +42,7 @@ var cumulativeNumTsfms = unpackTriple[2];
 var numTiles = tsfms.length;
 var bigTsfmArray = new Array(numObjects * numTiles);
 
-var movedTowardsCentralCubeThisFrame = false;
+var movedTowardsCentralCubeThisFrameIndex = false;
 
 function loadStuff(){ 
   
@@ -103,7 +104,7 @@ function loadStuff(){
       var i = j + numTiles*k;
       bigTsfmArray[i].uniforms['translationR'].value = tsfms[j][0];
       bigTsfmArray[i].uniforms['translationH2'].value = tsfms[j][1];
-      bigTsfmArray[i].uniforms['cellColorIndex'].value = word2colorIndex( words[j] );
+      bigTsfmArray[i].uniforms['cellColorQuat'].value = word2colorQuat( words[j] );
       bigTsfmArray[i].uniforms['globalZScaling'].value = globalZScaling;
       bigTsfmArray[i].uniforms['globalCoordChange'].value = globalCoordChange;
 
@@ -165,13 +166,13 @@ function init() {
       //   type: "v3",
       //   value: new THREE.Vector3(0.5,0.5,0.5)
       // }
-      cellColorIndex: {
-        type: "i",
-        value: 0
+      cellColorQuat: {
+        type: "v4",
+        value: new THREE.Quaternion( 0,0,0,1 )
       },
-      userCellColorIndex: {  // which index colour the user is in
-        type: "i",
-        value: 0
+      userCellColorQuat: {  // which index colour the user is in
+        type: "v4",
+        value: new THREE.Quaternion( 0,0,0,1 )
       }
     },
     vertexShader: document.getElementById('vertexShader').textContent,
@@ -205,16 +206,21 @@ function init() {
 
 
 function animate() {
-  controls.update();  // need to get movedTowardsCentralCubeThisFrame before updating stuff
+  controls.update();  // need to get movedTowardsCentralCubeThisFrameIndex before updating stuff
 
   for (var k = 0; k < numObjects; k++) {
     for (var j = 0; j < numTiles; j++) {
       var i = j + numTiles*k;
       bigTsfmArray[i].uniforms['boostR'].value = currentBoostR;
       bigTsfmArray[i].uniforms['boostH2'].value = currentBoostH2;
-      if (movedTowardsCentralCubeThisFrame) {
-        bigTsfmArray[i].uniforms['userCellColorIndex'].value = 1 - bigTsfmArray[i].uniforms['userCellColorIndex'].value;
-      }
+      if (movedTowardsCentralCubeThisFrameIndex != false) {
+        
+        var tempQuat = new THREE.Quaternion();
+        tempQuat.copy(bigTsfmArray[i].uniforms['userCellColorQuat'].value);
+        tempQuat.multiply(genQuatsColourSchemes[colourMode][movedTowardsCentralCubeThisFrameIndex]);      
+
+        bigTsfmArray[i].uniforms['userCellColorQuat'].value = tempQuat;
+       }
 
 
     // bigTsfmArray[i].visible = phraseOnOffMaps[currentPhrase][k];
@@ -238,6 +244,23 @@ function selectShape(event) {
            scene.remove(scene.children[scene.children.length - 1]);
        }
     decoration = decorationArray[(keySelect-1)];
+    loadStuff();
+    }
+  }
+}
+
+document.addEventListener('keydown', function(event) { changeColourMode(event); }, false);
+
+function changeColourMode(event) {
+
+  var keySelect = event.keyCode; 
+
+  if (keySelect == 67){  //c
+     if (scene) {
+       while (scene.children.length > 0) {
+           scene.remove(scene.children[scene.children.length - 1]);
+       }
+    colourMode = (colourMode + 1) % genQuatsColourSchemes.length;
     loadStuff();
     }
   }

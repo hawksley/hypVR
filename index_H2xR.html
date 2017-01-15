@@ -82,8 +82,8 @@
     uniform float boostR;
     uniform mat4 boostH2;
     // uniform vec3 cellColor;
-    uniform int cellColorIndex; 
-    uniform int userCellColorIndex; 
+    uniform vec4 cellColorQuat; 
+    uniform vec4 userCellColorQuat; 
 
     vec3 ChooseColor( in vec3 nBase )
     {
@@ -106,10 +106,10 @@
     vec4 quatMult( in vec4 p, in vec4 q )
     {
         vec4 r;
-        r.w = + p.w*q.w - p.x*q.x - p.y*q.y - p.z*q.z;
         r.x = + p.w*q.x + p.x*q.w + p.y*q.z - p.z*q.y;
         r.y = + p.w*q.y - p.x*q.z + p.y*q.w + p.z*q.x;
         r.z = + p.w*q.z + p.x*q.y - p.y*q.x + p.z*q.w;
+        r.w = + p.w*q.w - p.x*q.x - p.y*q.y - p.z*q.z;
         return r;
     }
 
@@ -153,6 +153,25 @@
         float g = 2. * (u*y - v*x);
         float b = x*x + y*y - u*u - v*v;
 
+        return vec3(r*0.5 + 0.5,g*0.5 + 0.5,b*0.5 + 0.5);
+    }
+
+
+    vec3 StereoProjColor( in vec4 nBase )
+    {
+        vec4 n = quatMult( -vec4(0.5,0.5,0.5,0.5), nBase );
+        float x = n.x;
+        float y = n.y;
+        float z = n.z;
+        float w = n.w;
+        float denom = 1.0-w;
+        float r = x/denom;
+        float g = y/denom;
+        float b = z/denom;
+        float norm = sqrt(r*r+g*g+b*b);
+        r /= norm;
+        g /= norm;
+        b /= norm; 
         return vec3(r*0.5 + 0.5,g*0.5 + 0.5,b*0.5 + 0.5);
     }
 
@@ -223,11 +242,8 @@
       n3sphere = quatMult( n3sphere, quatInv( p3sphere ) );
       n3sphere = normalize(n3sphere);
 
-      float colorIndex = mod(float(cellColorIndex + userCellColorIndex), 2.0); // glsl mod is weird
-
-      float c = 0.5 * float(colorIndex) + 0.25;
-
-      vec3 col = 0.5*( HopfColor(n3sphere)-vec3(0.5,0.5,0.5) ) + vec3(c,c,c);
+     
+      vec3 col = 0.25*(StereoProjColor(n3sphere) - vec3(0.5,0.5,0.5)) + 0.75*StereoProjColor( quatMult(userCellColorQuat,  cellColorQuat) );
       vColor = col;
 
       // base position

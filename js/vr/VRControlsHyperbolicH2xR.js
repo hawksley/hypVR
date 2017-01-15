@@ -126,7 +126,7 @@ THREE.VRControls = function ( camera, done ) {
 		//if outside central cell, move back
 		if (fixOutside){
 			 var triple = fixOutsideCentralCellH2xR( currentBoostR, currentBoostH2, tilingGens );
-             movedTowardsCentralCubeThisFrame = triple[0];
+             movedTowardsCentralCubeThisFrameIndex = triple[0];
              currentBoostR = triple[1];
              currentBoostH2 = triple[2];
 		}

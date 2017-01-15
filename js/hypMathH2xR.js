@@ -338,7 +338,7 @@ function fixOutsideCentralCellH2xR( tsfmR, tsfmH2, gens ) {
         // console.log(tsfm[1].multiply(gens[bestIndex][1]));
         // tsfm = [ tsfm[0] + gens[bestIndex][0], tsfm[1].multiply(gens[bestIndex][1]) ];
         // console.log(tsfm[1]);
-        return [true, tsfmR, tsfmH2];
+        return [bestIndex, tsfmR, tsfmH2];
     }           
     else {
         return [false, tsfmR, tsfmH2];

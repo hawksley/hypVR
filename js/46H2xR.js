@@ -27,33 +27,111 @@ var globalCoordChange = new THREE.Matrix4().set(
 //     0, 0, 1, 0,
 //     0, 0, 0, 1);
 
-var globalCoordChangeInv = new THREE.Matrix4();
+var globalCoordChangeInv = new THREE.Matrix4().identity();
 globalCoordChangeInv.getInverse(globalCoordChange);
+
+var rotx = new THREE.Matrix4().makeRotationX( Math.PI/2 );
+var rotxi = new THREE.Matrix4().makeRotationX( -Math.PI/2 );
+var roty = new THREE.Matrix4().makeRotationY( Math.PI/2 );
+var rotyi = new THREE.Matrix4().makeRotationY( -Math.PI/2 );
+var rotz = new THREE.Matrix4().makeRotationZ( Math.PI/2 );
+var rotzi = new THREE.Matrix4().makeRotationZ( -Math.PI/2 );
 
 var tilingGens =
 [
 [0, new THREE.Matrix4()],  //[0, id matrix]
-translateByVectorH2xR(new THREE.Vector3(dist,0,0)) ,
-translateByVectorH2xR(new THREE.Vector3(-dist,0,0)) ,
-translateByVectorH2xR(new THREE.Vector3(0,dist,0)) ,
-translateByVectorH2xR(new THREE.Vector3(0,-dist,0)) ,
+[translateByVectorH2xR(new THREE.Vector3(dist,0,0))[0], translateByVectorH2xR(new THREE.Vector3(dist,0,0))[1].multiply(rotzi)] ,
+[translateByVectorH2xR(new THREE.Vector3(-dist,0,0))[0] , translateByVectorH2xR(new THREE.Vector3(-dist,0,0))[1].multiply(rotzi)],
+[translateByVectorH2xR(new THREE.Vector3(0,dist,0))[0] , translateByVectorH2xR(new THREE.Vector3(0,dist,0))[1].multiply(rotz)],
+[translateByVectorH2xR(new THREE.Vector3(0,-dist,0))[0] ,translateByVectorH2xR(new THREE.Vector3(0,-dist,0))[1].multiply(rotz)],
+// [translateByVectorH2xR(new THREE.Vector3(dist,0,0))[0], translateByVectorH2xR(new THREE.Vector3(dist,0,0))[1] ],
+// [translateByVectorH2xR(new THREE.Vector3(-dist,0,0))[0] , translateByVectorH2xR(new THREE.Vector3(-dist,0,0))[1] ],
+// [translateByVectorH2xR(new THREE.Vector3(0,dist,0))[0] , translateByVectorH2xR(new THREE.Vector3(0,dist,0))[1] ],
+// [translateByVectorH2xR(new THREE.Vector3(0,-dist,0))[0] ,translateByVectorH2xR(new THREE.Vector3(0,-dist,0))[1] ],
 translateByVectorH2xR(new THREE.Vector3(0,0,2*globalZScaling)) ,    
 translateByVectorH2xR(new THREE.Vector3(0,0,-2*globalZScaling))     // related to scaling of cube in indexH2xR
 ];
 
-console.log('tilingGens')
-console.log(tilingGens)
+var genQuatsColourSchemes = 
+[
+  [ //// 8 colours untwisted
+  ////yellow-blue colouring
+  new THREE.Quaternion(0,0,0,1),
+  new THREE.Quaternion(0.86602,0,0,-0.5),
+  new THREE.Quaternion(-0.86602,0,0,-0.5),
+  new THREE.Quaternion(0.86602,0,0,-0.5),
+  new THREE.Quaternion(-0.86602,0,0,-0.5),
+  new THREE.Quaternion(0,0,0,-1),
+  new THREE.Quaternion(0,0,0,-1) 
+  ],
+  [ //// 8 colours untwisted
+  ////cyan-red colouring
+  new THREE.Quaternion(0,0,0,1),
+  new THREE.Quaternion(0,0.86602,0,-0.5),
+  new THREE.Quaternion(0,-0.86602,0,-0.5),
+  new THREE.Quaternion(0,0.86602,0,-0.5),
+  new THREE.Quaternion(0,-0.86602,0,-0.5),
+  new THREE.Quaternion(0,0,0,-1),
+  new THREE.Quaternion(0,0,0,-1)
+  ],
+  [ //// 8 colours untwisted
+ ////green-mauve colouring
+  new THREE.Quaternion(0,0,0,1),
+  new THREE.Quaternion(0,0,0.86602,-0.5),
+  new THREE.Quaternion(0,0,-0.86602,-0.5),
+  new THREE.Quaternion(0,0,0.86602,-0.5),
+  new THREE.Quaternion(0,0,-0.86602,-0.5),
+  new THREE.Quaternion(0,0,0,-1),
+  new THREE.Quaternion(0,0,0,-1) 
+  ],
+  [ //// 8 colours twisted
+    ////yellow-blue colouring
+  new THREE.Quaternion(0,0,0,1),
+  new THREE.Quaternion(0.86602,0,0,0.5),
+  new THREE.Quaternion(-0.86602,0,0,0.5),
+  new THREE.Quaternion(0.86602,0,0,0.5),
+  new THREE.Quaternion(-0.86602,0,0,0.5),
+  new THREE.Quaternion(0,0,0,-1),
+  new THREE.Quaternion(0,0,0,-1)
+  ],
+  [ //// 8 colours twisted
+  ////cyan-red colouring
+  new THREE.Quaternion(0,0,0,1),
+  new THREE.Quaternion(0,0.86602,0,0.5),
+  new THREE.Quaternion(0,-0.86602,0,0.5),
+  new THREE.Quaternion(0,0.86602,0,0.5),
+  new THREE.Quaternion(0,-0.86602,0,0.5),
+  new THREE.Quaternion(0,0,0,-1),
+  new THREE.Quaternion(0,0,0,-1)
+  ],
+  [ //// 8 colours twisted
+  //green-mauve colouring
+  new THREE.Quaternion(0,0,0,1),
+  new THREE.Quaternion(0,0,0.86602,0.5),
+  new THREE.Quaternion(0,0,-0.86602,0.5),
+  new THREE.Quaternion(0,0,0.86602,0.5),
+  new THREE.Quaternion(0,0,-0.86602,0.5),
+  new THREE.Quaternion(0,0,0,-1),
+  new THREE.Quaternion(0,0,0,-1)
+  ], 
+  [ //// 2 colours
+  new THREE.Quaternion(0,0,0,1),
+  new THREE.Quaternion(0,0,0,-1),
+  new THREE.Quaternion(0,0,0,-1),
+  new THREE.Quaternion(0,0,0,-1),
+  new THREE.Quaternion(0,0,0,-1),
+  new THREE.Quaternion(0,0,0,-1),
+  new THREE.Quaternion(0,0,0,-1)
+  ]
+];
 
-function word2colorIndex(word) {
+function word2colorQuat(word) {
     // word is a list of indexes into tilingGens
-    var count = 0;
+    var quat = new THREE.Quaternion(0,0,0,1);
     for (var j = 0; j < word.length; j++){
-        if (word[j] != 0){
-            count++;
-          }
+        quat.multiply( genQuatsColourSchemes[colourMode][word[j]] ) 
     }
-    // var foo = 0.25 + 0.5*(count%2);  //light or dark gray
-    // return new THREE.Vector3(foo, foo, foo);
-    return count % 2;
+    return quat;
 }
+
 
