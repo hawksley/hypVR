@@ -54,65 +54,72 @@ translateByVectorH2xR(new THREE.Vector3(0,0,-2*globalZScaling))     // related t
 
 var genQuatsColourSchemes = 
 [
+  
+  [ //// 8 colours untwisted
+  ////cyan-red colouring
+  // new THREE.Quaternion(0,0,0,1),
+  // new THREE.Quaternion(0,0.86602,0,-0.5),
+  // new THREE.Quaternion(0,-0.86602,0,-0.5),
+  // new THREE.Quaternion(0,0.86602,0,-0.5),
+  // new THREE.Quaternion(0,-0.86602,0,-0.5),
+  // new THREE.Quaternion(0,0,0,-1),
+  // new THREE.Quaternion(0,0,0,-1)
+  new THREE.Quaternion(0,0,0,1),
+  new THREE.Quaternion(0,-0.86602,0,-0.5),
+  new THREE.Quaternion(0,-0.86602,0,-0.5),
+  new THREE.Quaternion(0,0.86602,0,-0.5),
+  new THREE.Quaternion(0,0.86602,0,-0.5),
+  new THREE.Quaternion(0,0.5,0,0.86602),
+  new THREE.Quaternion(0,-0.5,0,0.86602)
+  ],
   [ //// 8 colours untwisted
   ////yellow-blue colouring
   new THREE.Quaternion(0,0,0,1),
-  new THREE.Quaternion(0.86602,0,0,-0.5),
+  new THREE.Quaternion(-0.86602,0,0,-0.5),
   new THREE.Quaternion(-0.86602,0,0,-0.5),
   new THREE.Quaternion(0.86602,0,0,-0.5),
-  new THREE.Quaternion(-0.86602,0,0,-0.5),
-  new THREE.Quaternion(0,0,0,-1),
-  new THREE.Quaternion(0,0,0,-1) 
-  ],
-  [ //// 8 colours untwisted
-  ////cyan-red colouring
-  new THREE.Quaternion(0,0,0,1),
-  new THREE.Quaternion(0,0.86602,0,-0.5),
-  new THREE.Quaternion(0,-0.86602,0,-0.5),
-  new THREE.Quaternion(0,0.86602,0,-0.5),
-  new THREE.Quaternion(0,-0.86602,0,-0.5),
-  new THREE.Quaternion(0,0,0,-1),
-  new THREE.Quaternion(0,0,0,-1)
-  ],
-  [ //// 8 colours untwisted
+  new THREE.Quaternion(0.86602,0,0,-0.5),
+  new THREE.Quaternion(0.5,0,0,0.86602),
+  new THREE.Quaternion(-0.5,0,0,0.86602) 
+  ], [ //// 8 colours untwisted
  ////green-mauve colouring
   new THREE.Quaternion(0,0,0,1),
-  new THREE.Quaternion(0,0,0.86602,-0.5),
+  new THREE.Quaternion(0,0,-0.86602,-0.5),
   new THREE.Quaternion(0,0,-0.86602,-0.5),
   new THREE.Quaternion(0,0,0.86602,-0.5),
-  new THREE.Quaternion(0,0,-0.86602,-0.5),
-  new THREE.Quaternion(0,0,0,-1),
-  new THREE.Quaternion(0,0,0,-1) 
+  new THREE.Quaternion(0,0,0.86602,-0.5),
+  new THREE.Quaternion(0,0,0.5,0.86602),
+  new THREE.Quaternion(0,0,-0.5,0.86602) 
+  ],
+   [ //// 8 colours twisted
+  ////cyan-red colouring
+  new THREE.Quaternion(0,0,0,1),
+  new THREE.Quaternion(0,-0.86602,0,0.5),
+  new THREE.Quaternion(0,-0.86602,0,0.5),
+  new THREE.Quaternion(0,0.86602,0,0.5),
+  new THREE.Quaternion(0,0.86602,0,0.5),
+  new THREE.Quaternion(0,0.5,0,0.86602),
+  new THREE.Quaternion(0,-0.5,0,0.86602)
   ],
   [ //// 8 colours twisted
     ////yellow-blue colouring
   new THREE.Quaternion(0,0,0,1),
-  new THREE.Quaternion(0.86602,0,0,0.5),
+  new THREE.Quaternion(-0.86602,0,0,0.5),
   new THREE.Quaternion(-0.86602,0,0,0.5),
   new THREE.Quaternion(0.86602,0,0,0.5),
-  new THREE.Quaternion(-0.86602,0,0,0.5),
-  new THREE.Quaternion(0,0,0,-1),
-  new THREE.Quaternion(0,0,0,-1)
-  ],
-  [ //// 8 colours twisted
-  ////cyan-red colouring
-  new THREE.Quaternion(0,0,0,1),
-  new THREE.Quaternion(0,0.86602,0,0.5),
-  new THREE.Quaternion(0,-0.86602,0,0.5),
-  new THREE.Quaternion(0,0.86602,0,0.5),
-  new THREE.Quaternion(0,-0.86602,0,0.5),
-  new THREE.Quaternion(0,0,0,-1),
-  new THREE.Quaternion(0,0,0,-1)
+  new THREE.Quaternion(0.86602,0,0,0.5),
+  new THREE.Quaternion(0.5,0,0,0.86602),
+  new THREE.Quaternion(-0.5,0,0,0.86602)
   ],
   [ //// 8 colours twisted
   //green-mauve colouring
   new THREE.Quaternion(0,0,0,1),
-  new THREE.Quaternion(0,0,0.86602,0.5),
+  new THREE.Quaternion(0,0,-0.86602,0.5),
   new THREE.Quaternion(0,0,-0.86602,0.5),
   new THREE.Quaternion(0,0,0.86602,0.5),
-  new THREE.Quaternion(0,0,-0.86602,0.5),
-  new THREE.Quaternion(0,0,0,-1),
-  new THREE.Quaternion(0,0,0,-1)
+  new THREE.Quaternion(0,0,0.86602,0.5),
+  new THREE.Quaternion(0,0,0.5,0.86602),
+  new THREE.Quaternion(0,0,-0.5,0.86602)
   ], 
   [ //// 2 colours
   new THREE.Quaternion(0,0,0,1),
