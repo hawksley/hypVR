@@ -14,14 +14,14 @@ var currentBoostR = 0.0;
 var currentBoostH2 = new THREE.Matrix4().set(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
 
 var decorationArray = [
-  'monkey', 
+  'cube', 
   'cubeDual', 
   'truncatedCube', 
   'truncatedCubeTrisOnly',
   'truncatedCubeBdry', 
   'truncatedCubeMinimal',
   'screen2Cube',
-  'cube',
+  'monkey',
   'rhombicDodec'
   ];
 
@@ -43,79 +43,6 @@ var numTiles = tsfms.length;
 var bigTsfmArray = new Array(numObjects * numTiles);
 
 var movedTowardsCentralCubeThisFrameIndex = false;
-
-function loadStuff(){ 
-  
-  var manager = new THREE.LoadingManager();
-  var loader = new THREE.OBJLoader(manager);
-  
-  if (decoration == "monkey"){
-
-    loader.load('media/euc_monkey_cut_7p5k.obj', function (object) {
-      for (var i = 0; i < cumulativeNumTsfms[1]; i++) {
-        var newObject = object.clone();
-        newObject.children[0].material = bigTsfmArray[(i)];
-        // newObject.children[0].frustumCulled = false;
-        scene.add(newObject);
-      }
-    });
-
-      loader.load('media/euc_monkey_cut_3k.obj', function (object) {
-      for (var i = cumulativeNumTsfms[1]; i < cumulativeNumTsfms[2]; i++) {
-        var newObject = object.clone();
-        newObject.children[0].material = bigTsfmArray[(i)];
-        // newObject.children[0].frustumCulled = false;
-        scene.add(newObject);
-      }
-    });
-
-      loader.load('media/euc_monkey_cut_1p5k.obj', function (object) {
-      for (var i = cumulativeNumTsfms[2]; i < cumulativeNumTsfms[3]; i++) {
-        var newObject = object.clone();
-        newObject.children[0].material = bigTsfmArray[(i)];
-        // newObject.children[0].frustumCulled = false;
-        scene.add(newObject);
-      }
-    });
-
-      loader.load('media/monkey_750_tris.obj', function (object) {
-      for (var i = cumulativeNumTsfms[3]; i < numTiles; i++) {
-        var newObject = object.clone();
-        newObject.children[0].material = bigTsfmArray[(i)];
-        // newObject.children[0].frustumCulled = false;
-        scene.add(newObject);
-      }
-    });
-  }
-
-  else {
-
-      loader.load('media/'.concat(decoration, '.obj'), function (object) {
-      for (var i = 0; i < numTiles; i++) {
-        var newObject = object.clone();
-        newObject.children[0].material = bigTsfmArray[(i)];
-        // newObject.children[0].frustumCulled = false;
-        scene.add(newObject);
-      }
-    });
-  }
-  for (var k = 0; k < numObjects; k++) {
-    for (var j = 0; j < numTiles; j++) {
-      var i = j + numTiles*k;
-      bigTsfmArray[i].uniforms['translationR'].value = tsfms[j][0];
-      bigTsfmArray[i].uniforms['translationH2'].value = tsfms[j][1];
-      bigTsfmArray[i].uniforms['cellColorQuat'].value = word2colorQuat( words[j] );
-      bigTsfmArray[i].uniforms['globalZScaling'].value = globalZScaling;
-      bigTsfmArray[i].uniforms['globalCoordChange'].value = globalCoordChange;
-
-    // bigTsfmArray[i].visible = phraseOnOffMaps[currentPhrase][k];
-    }
-  }
-
-
-} 
-
-
 
 function init() {
   start = Date.now();
@@ -204,6 +131,76 @@ function init() {
   effect.render(scene, camera);
 }
 
+function loadStuff(){ 
+  
+  var manager = new THREE.LoadingManager();
+  var loader = new THREE.OBJLoader(manager);
+  
+  if (decoration == "monkey"){
+
+    loader.load('media/euc_monkey_cut_7p5k.obj', function (object) {
+      for (var i = 0; i < cumulativeNumTsfms[1]; i++) {
+        var newObject = object.clone();
+        newObject.children[0].material = bigTsfmArray[(i)];
+        // newObject.children[0].frustumCulled = false;
+        scene.add(newObject);
+      }
+    });
+
+      loader.load('media/euc_monkey_cut_3k.obj', function (object) {
+      for (var i = cumulativeNumTsfms[1]; i < cumulativeNumTsfms[2]; i++) {
+        var newObject = object.clone();
+        newObject.children[0].material = bigTsfmArray[(i)];
+        // newObject.children[0].frustumCulled = false;
+        scene.add(newObject);
+      }
+    });
+
+      loader.load('media/euc_monkey_cut_1p5k.obj', function (object) {
+      for (var i = cumulativeNumTsfms[2]; i < cumulativeNumTsfms[3]; i++) {
+        var newObject = object.clone();
+        newObject.children[0].material = bigTsfmArray[(i)];
+        // newObject.children[0].frustumCulled = false;
+        scene.add(newObject);
+      }
+    });
+
+      loader.load('media/monkey_750_tris.obj', function (object) {
+      for (var i = cumulativeNumTsfms[3]; i < numTiles; i++) {
+        var newObject = object.clone();
+        newObject.children[0].material = bigTsfmArray[(i)];
+        // newObject.children[0].frustumCulled = false;
+        scene.add(newObject);
+      }
+    });
+  }
+
+  else {
+
+      loader.load('media/'.concat(decoration, '.obj'), function (object) {
+      for (var i = 0; i < numTiles; i++) {
+        var newObject = object.clone();
+        newObject.children[0].material = bigTsfmArray[(i)];
+        // newObject.children[0].frustumCulled = false;
+        scene.add(newObject);
+      }
+    });
+  }
+  for (var k = 0; k < numObjects; k++) {
+    for (var j = 0; j < numTiles; j++) {
+      var i = j + numTiles*k;
+      bigTsfmArray[i].uniforms['translationR'].value = tsfms[j][0];
+      bigTsfmArray[i].uniforms['translationH2'].value = tsfms[j][1];
+      bigTsfmArray[i].uniforms['cellColorQuat'].value = word2colorQuat( words[j] );
+      bigTsfmArray[i].uniforms['globalZScaling'].value = globalZScaling;
+      bigTsfmArray[i].uniforms['globalCoordChange'].value = globalCoordChange;
+
+    // bigTsfmArray[i].visible = phraseOnOffMaps[currentPhrase][k];
+    }
+  }
+
+
+} 
 
 function animate() {
   controls.update();  // need to get movedTowardsCentralCubeThisFrameIndex before updating stuff
