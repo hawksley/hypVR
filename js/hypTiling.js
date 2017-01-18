@@ -14,12 +14,12 @@ var currentBoost = new THREE.Matrix4().set(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
 
 var decorationArray = [
   'cube', 
-  'cubeDual', 
+  'cubeThickEdges',
   'truncatedCube', 
   'truncatedCubeTrisOnly',
   'truncatedCubeBdry', 
   'truncatedCubeMinimal',
-  'screen2Cube',
+  'cubeDual', 
   'monkey',
   'monkey2',
   'rhombicDodec'
@@ -32,7 +32,7 @@ var doubleSided = false;
 
 var numObjects = 1; //number of obj files to load
 var numGens = tilingGens.length;
-var tilingDepth = 5; //default 4
+var tilingDepth = 4; //default 4
 
 var unpackTriple = makeTsfmsList( tilingGens, tilingDepth );
 var tsfms = unpackTriple[0];
