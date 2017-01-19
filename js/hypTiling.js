@@ -18,11 +18,11 @@ var decorationArray = [
   'truncatedCube', 
   'truncatedCubeTrisOnly',
   'truncatedCubeBdry', 
-  'truncatedCubeMinimal',
   'cubeDual', 
   'monkey',
   'monkey2',
-  'rhombicDodec'
+  'monkey3'
+  //'rhombicDodec'
   ];
 
 var decoration = "truncatedCube";
@@ -125,11 +125,14 @@ function loadStuff(){
   var manager = new THREE.LoadingManager();
   var loader = new THREE.OBJLoader(manager);
   
-  if (decoration == "monkey" || decoration == "monkey2"){
+  if (decoration == "monkey" || decoration == "monkey2" || decoration == "monkey3"){
     numObjects = 2;
     updateBigMatArray();
 
     if (decoration == "monkey"){
+      var cubeDecoration = 'cube';
+    }
+    else if (decoration == "monkey2"){
       var cubeDecoration = 'truncatedCube';
     }
     else {
