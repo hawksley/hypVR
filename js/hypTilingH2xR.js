@@ -15,12 +15,12 @@ var currentBoostH2 = new THREE.Matrix4().set(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
 
 var decorationArray = [
   'cube', 
-  'cubeDual', 
+  'cubeThickEdges',
   'truncatedCube', 
   'truncatedCubeTrisOnly',
   'truncatedCubeBdry', 
   'truncatedCubeMinimal',
-  'screen2Cube',
+  'cubeDual', 
   'monkey',
   'rhombicDodec'
   ];
