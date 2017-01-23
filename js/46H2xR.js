@@ -9,11 +9,15 @@ function acosh(arg) {
   return Math.log(arg + Math.sqrt(arg * arg - 1));
 }
 
-var dist = 2*acosh( Math.sqrt(1.5) )  // 436 or 46 in H^2
-// var globalZScaling = 0.3; //height of cubes relative to x,y dimensions
+var dist = 2*acosh( Math.sqrt(1.5))  // 436 or 46 in H^2
 
-var globalZScaling = 0.57735;
-// var globalZScaling = 1.0;
+var globalZScaling = 0.810497;
+// The globalZScaling comes from the inverse of the exponential map.
+// The corners of the cube are (it turns out) located at {1,1,1} on the 
+// hyperboloid. The inverse of the exponential map says that this 
+// corresponds to a point in the tangent space that is arcsinh(r)/r away, 
+// where r = sqrt(x^2+y^2).
+// Here, globalZScaling = arcsinh(sqrt(2))/sqrt(2) = 0.810497.
 
 var globalCoordChange = new THREE.Matrix4().set(   
     0, 1, 0, 0,
@@ -22,8 +26,14 @@ var globalCoordChange = new THREE.Matrix4().set(
     0, 0, 0, 1);
 
 // var globalCoordChange = new THREE.Matrix4().set(   
-//     1, 0, 0, 0,
-//     0, 1, 0, 0, //rotate so that R is in vertical dir on screen
+//     0, -1, 0, 0,
+//     0, 0, 1, 0, //rotate so that R is in vertical dir on screen
+//     -1, 0, 0, 0,
+//     0, 0, 0, 1);
+
+// var globalCoordChange = new THREE.Matrix4().set(   
+//     0, -1, 0, 0,
+//     1, 0, 0, 0, 
 //     0, 0, 1, 0,
 //     0, 0, 0, 1);
 
@@ -55,43 +65,7 @@ translateByVectorH2xR(new THREE.Vector3(0,0,-2*globalZScaling))     // related t
 var genQuatsColourSchemes = 
 [
   
-  [ //// 8 colours untwisted
-  ////cyan-red colouring
-  // new THREE.Quaternion(0,0,0,1),
-  // new THREE.Quaternion(0,0.86602,0,-0.5),
-  // new THREE.Quaternion(0,-0.86602,0,-0.5),
-  // new THREE.Quaternion(0,0.86602,0,-0.5),
-  // new THREE.Quaternion(0,-0.86602,0,-0.5),
-  // new THREE.Quaternion(0,0,0,-1),
-  // new THREE.Quaternion(0,0,0,-1)
-  new THREE.Quaternion(0,0,0,1),
-  new THREE.Quaternion(0,-0.86602,0,-0.5),
-  new THREE.Quaternion(0,-0.86602,0,-0.5),
-  new THREE.Quaternion(0,0.86602,0,-0.5),
-  new THREE.Quaternion(0,0.86602,0,-0.5),
-  new THREE.Quaternion(0,0.5,0,0.86602),
-  new THREE.Quaternion(0,-0.5,0,0.86602)
-  ],
-  [ //// 8 colours untwisted
-  ////yellow-blue colouring
-  new THREE.Quaternion(0,0,0,1),
-  new THREE.Quaternion(-0.86602,0,0,-0.5),
-  new THREE.Quaternion(-0.86602,0,0,-0.5),
-  new THREE.Quaternion(0.86602,0,0,-0.5),
-  new THREE.Quaternion(0.86602,0,0,-0.5),
-  new THREE.Quaternion(0.5,0,0,0.86602),
-  new THREE.Quaternion(-0.5,0,0,0.86602) 
-  ], [ //// 8 colours untwisted
- ////green-mauve colouring
-  new THREE.Quaternion(0,0,0,1),
-  new THREE.Quaternion(0,0,-0.86602,-0.5),
-  new THREE.Quaternion(0,0,-0.86602,-0.5),
-  new THREE.Quaternion(0,0,0.86602,-0.5),
-  new THREE.Quaternion(0,0,0.86602,-0.5),
-  new THREE.Quaternion(0,0,0.5,0.86602),
-  new THREE.Quaternion(0,0,-0.5,0.86602) 
-  ],
-   [ //// 8 colours twisted
+  [ //// 6 colours 
   ////cyan-red colouring
   new THREE.Quaternion(0,0,0,1),
   new THREE.Quaternion(0,-0.86602,0,0.5),
@@ -101,7 +75,7 @@ var genQuatsColourSchemes =
   new THREE.Quaternion(0,0.5,0,0.86602),
   new THREE.Quaternion(0,-0.5,0,0.86602)
   ],
-  [ //// 8 colours twisted
+  [ //// 6 colours 
     ////yellow-blue colouring
   new THREE.Quaternion(0,0,0,1),
   new THREE.Quaternion(-0.86602,0,0,0.5),
@@ -111,7 +85,7 @@ var genQuatsColourSchemes =
   new THREE.Quaternion(0.5,0,0,0.86602),
   new THREE.Quaternion(-0.5,0,0,0.86602)
   ],
-  [ //// 8 colours twisted
+  [ //// 6 colours 
   //green-mauve colouring
   new THREE.Quaternion(0,0,0,1),
   new THREE.Quaternion(0,0,-0.86602,0.5),
@@ -121,6 +95,36 @@ var genQuatsColourSchemes =
   new THREE.Quaternion(0,0,0.5,0.86602),
   new THREE.Quaternion(0,0,-0.5,0.86602)
   ], 
+  [ //// 3 colours 
+    ////cyan-red colouring
+  new THREE.Quaternion(0,0,0,1),
+  new THREE.Quaternion(0,-0.86602,0,-0.5),
+  new THREE.Quaternion(0,-0.86602,0,-0.5),
+  new THREE.Quaternion(0,0.86602,0,-0.5),
+  new THREE.Quaternion(0,0.86602,0,-0.5),
+  new THREE.Quaternion(0,0.5,0,0.86602),
+  new THREE.Quaternion(0,-0.5,0,0.86602)
+  ],
+  [ //// 3 colours 
+  ////yellow-blue colouring
+  new THREE.Quaternion(0,0,0,1),
+  new THREE.Quaternion(-0.86602,0,0,-0.5),
+  new THREE.Quaternion(-0.86602,0,0,-0.5),
+  new THREE.Quaternion(0.86602,0,0,-0.5),
+  new THREE.Quaternion(0.86602,0,0,-0.5),
+  new THREE.Quaternion(0.5,0,0,0.86602),
+  new THREE.Quaternion(-0.5,0,0,0.86602) 
+  ], 
+  [ //// 3 colours 
+ ////green-mauve colouring
+  new THREE.Quaternion(0,0,0,1),
+  new THREE.Quaternion(0,0,-0.86602,-0.5),
+  new THREE.Quaternion(0,0,-0.86602,-0.5),
+  new THREE.Quaternion(0,0,0.86602,-0.5),
+  new THREE.Quaternion(0,0,0.86602,-0.5),
+  new THREE.Quaternion(0,0,0.5,0.86602),
+  new THREE.Quaternion(0,0,-0.5,0.86602) 
+  ],
   [ //// 2 colours
   new THREE.Quaternion(0,0,0,1),
   new THREE.Quaternion(0,0,0,-1),
