@@ -103,6 +103,7 @@ THREE.VRControls = function ( camera, done ) {
 
 		}
 		if (offset !== undefined) {
+            offset.applyMatrix4(globalCoordChangeInv); //for making the R direction be up on screen
 			m = translateByVectorH2xR(offset);
             mR = m[0];
             mH2 = m[1];
@@ -125,7 +126,7 @@ THREE.VRControls = function ( camera, done ) {
 		//if outside central cell, move back
 		if (fixOutside){
 			 var triple = fixOutsideCentralCellH2xR( currentBoostR, currentBoostH2, tilingGens );
-             movedTowardsCentralCubeThisFrame = triple[0];
+             movedTowardsCentralCubeThisFrameIndex = triple[0];
              currentBoostR = triple[1];
              currentBoostH2 = triple[2];
 		}

@@ -21,9 +21,9 @@ function areSameMatrix(mat1, mat2) {  //look only at last column - center of cel
 			return false;
 		}
 	}
-	console.log('same matrix')
-	console.log(mat1.elements)
-	console.log(mat2.elements)
+	// console.log('same matrix')
+	// console.log(mat1.elements)
+	// console.log(mat2.elements)
 	return true;
 }
 
@@ -70,7 +70,7 @@ function makeTsfmsList( tilingGens, tilingDepth ) {
 	      digits[digits.length] = jcopy % numGens;
 	      jcopy = (jcopy/numGens)|0;
 	    }
-	    console.log(digits);
+	    // console.log(digits);
 	    var newTsfm = new THREE.Matrix4();
 	    for (var l = 0; l < tilingDepth; l++) {
 	      newTsfm = newTsfm.multiply(tilingGens[digits[l]]);
@@ -262,7 +262,7 @@ function fixOutsideCentralCell( mat, gens ) {
 	}
 	if (bestIndex != 0){
 		mat = mat.multiply(gens[bestIndex]);
-        return true;
+        return bestIndex;
 	}			
     else {
         return false;

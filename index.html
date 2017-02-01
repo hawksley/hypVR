@@ -45,8 +45,8 @@
     uniform mat4 translation; // dodecahedral
     uniform mat4 boost;
     // uniform vec3 cellColor;
-    uniform int cellColorIndex; 
-    uniform int userCellColorIndex; 
+    uniform vec4 cellColorQuat; 
+    uniform vec4 userCellColorQuat; 
 
     vec3 ChooseColor( in vec3 nBase )
     {
@@ -69,10 +69,10 @@
     vec4 quatMult( in vec4 p, in vec4 q )
     {
         vec4 r;
-        r.w = + p.w*q.w - p.x*q.x - p.y*q.y - p.z*q.z;
         r.x = + p.w*q.x + p.x*q.w + p.y*q.z - p.z*q.y;
         r.y = + p.w*q.y - p.x*q.z + p.y*q.w + p.z*q.x;
         r.z = + p.w*q.z + p.x*q.y - p.y*q.x + p.z*q.w;
+        r.w = + p.w*q.w - p.x*q.x - p.y*q.y - p.z*q.z;
         return r;
     }
 
@@ -104,6 +104,7 @@
     // returns a color based on the 4D normal
     vec3 HopfColor( in vec4 nBase )
     {
+       // vec4 n = nBase;
         vec4 n = quatMult( nBase, vec4(0,1,0,0) );  //makes hypTiling monkeys have nicer colours
 
       // compute the color
@@ -116,6 +117,28 @@
         float g = 2. * (u*y - v*x);
         float b = x*x + y*y - u*u - v*v;
 
+        return vec3(r*0.5 + 0.5,g*0.5 + 0.5,b*0.5 + 0.5);
+    }
+
+    vec3 StereoProjColor( in vec4 nBase )
+    {
+        if (length(nBase) < 0.1)
+        {
+          return vec3(0.5, 0.5, 0.5);
+        }
+        vec4 n = quatMult( -vec4(0.5,0.5,0.5,0.5), nBase );
+        float x = n.x;
+        float y = n.y;
+        float z = n.z;
+        float w = n.w;
+        float denom = 1.0-w;
+        float r = x/denom;
+        float g = y/denom;
+        float b = z/denom;
+        float norm = sqrt(r*r+g*g+b*b);
+        r /= norm;
+        g /= norm;
+        b /= norm; 
         return vec3(r*0.5 + 0.5,g*0.5 + 0.5,b*0.5 + 0.5);
     }
 
@@ -165,11 +188,8 @@
       n3sphere = quatMult( n3sphere, quatInv( p3sphere ) );
       n3sphere = normalize(n3sphere);
 
-      float colorIndex = mod(float(cellColorIndex + userCellColorIndex), 2.0); // glsl mod is weird
+      vec3 col = 0.25*(StereoProjColor(n3sphere) - vec3(0.5,0.5,0.5)) + 0.75*StereoProjColor( quatMult(userCellColorQuat, cellColorQuat) );
 
-      float c = 0.5 * float(colorIndex) + 0.25;
-
-      vec3 col = 0.5*( HopfColor(n3sphere)-vec3(0.5,0.5,0.5) ) + vec3(c,c,c);
       vColor = col;
 
       // base position

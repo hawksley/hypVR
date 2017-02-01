@@ -118,7 +118,7 @@ THREE.VRControls = function ( camera, done ) {
 
 		//if outside central cell, move back
 		if (fixOutside){
-			movedTowardsCentralCubeThisFrame = fixOutsideCentralCell( currentBoost, tilingGens );
+			movedTowardsCentralCubeThisFrameIndex = fixOutsideCentralCell( currentBoost, tilingGens );
 		}
 
 		//run to avoid error accumulation
@@ -246,7 +246,7 @@ function onkey(event) {
   	fixOutside = !fixOutside;
   }	else if (event.keyCode == 82) { // r
   	fixOutsideCentralCell( currentBoost, tilingGens );
-  }	  
+  }	 
 }
 
 window.addEventListener("keydown", onkey, true);

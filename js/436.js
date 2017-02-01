@@ -34,25 +34,54 @@ var rotzi = new THREE.Matrix4().makeRotationZ( -Math.PI/2 );
 
 var tilingGens =
 [
-new THREE.Matrix4(),  //id matrix
+new THREE.Matrix4().identity(),  //id matrix
 rotxi.multiply( translateByVector(new THREE.Vector3(dist,0,0)) ),
 rotx.multiply( translateByVector(new THREE.Vector3(-dist,0,0)) ),
 rotyi.multiply( translateByVector(new THREE.Vector3(0,dist,0)) ),
 roty.multiply( translateByVector(new THREE.Vector3(0,-dist,0)) ),
 rotzi.multiply( translateByVector(new THREE.Vector3(0,0,dist)) ),
 rotz.multiply( translateByVector(new THREE.Vector3(0,0,-dist)) )
+];  ///these multiplies are consistent with left hand screw monkeys
+
+var genQuatsColourSchemes = 
+[
+  [ //// 8 colours untwisted
+  new THREE.Quaternion(0,0,0,1),
+  new THREE.Quaternion(-1,0,0,0),
+  new THREE.Quaternion(1,0,0,0),
+  new THREE.Quaternion(0,-1,0,0),
+  new THREE.Quaternion(0,1,0,0),
+  new THREE.Quaternion(0,0,-1,0),
+  new THREE.Quaternion(0,0,1,0)
+  ],
+  [ //// 8 colours twisted
+  new THREE.Quaternion(0,0,0,1),
+  new THREE.Quaternion(1,0,0,0),
+  new THREE.Quaternion(-1,0,0,0),
+  new THREE.Quaternion(0,1,0,0),
+  new THREE.Quaternion(0,-1,0,0),
+  new THREE.Quaternion(0,0,1,0),
+  new THREE.Quaternion(0,0,-1,0)
+  ], 
+  [ //// 2 colours
+  new THREE.Quaternion(0,0,0,1),
+  new THREE.Quaternion(0,0,0,-1),
+  new THREE.Quaternion(0,0,0,-1),
+  new THREE.Quaternion(0,0,0,-1),
+  new THREE.Quaternion(0,0,0,-1),
+  new THREE.Quaternion(0,0,0,-1),
+  new THREE.Quaternion(0,0,0,-1)
+  ]
 ];
 
-function word2colorIndex(word) {
+function word2colorQuat(word) {
     // word is a list of indexes into tilingGens
-    var count = 0;
-    for (var j = 0; j < word.length; j++){
-        if (word[j] != 0){
-            count++;
-          }
+    var quat = new THREE.Quaternion(0,0,0,1);
+    for (var j = 0; j < word.length; j++){  
+        quat.multiply( genQuatsColourSchemes[colourMode][word[j]] ) 
     }
-    // var foo = 0.25 + 0.5*(count%2);  //light or dark gray
-    // return new THREE.Vector3(foo, foo, foo);
-    return count % 2;
+    return quat;
 }
+
+
 

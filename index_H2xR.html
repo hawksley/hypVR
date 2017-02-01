@@ -35,7 +35,40 @@
         </style>
     </head>
 
-    <body></body>
+    <body>
+   <!--    <div style="
+          position: fixed;
+          top: 50%;
+          right: 50%;
+          padding: 5px;
+          border-right: .5px solid white;
+          border-top: .5px solid white;
+      "></div>
+      <div style="
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          padding: 5px;
+          border-left: .5px solid white;
+          border-top: .5px solid white;
+      "></div>
+       <div style="
+          position: fixed;
+          bottom: 50%;
+          right: 50%;
+          padding: 5px;
+          border-right: .5px solid white;
+          border-bottom: .5px solid white;
+      "></div>
+       <div style="
+          position: fixed;
+          bottom: 50%;
+          left: 50%;
+          padding: 5px;
+          border-left: .5px solid white;
+          border-bottom: .5px solid white;
+      "></div> -->
+    </body>
 
     <script type="x-shader/x-vertex" id="vertexShader">
     // This shader moves vertices around
@@ -43,13 +76,14 @@
     // input
     uniform float time; // global time in seconds
     uniform float globalZScaling;
+    uniform mat4 globalCoordChange;
     uniform float translationR;
     uniform mat4 translationH2; 
     uniform float boostR;
     uniform mat4 boostH2;
     // uniform vec3 cellColor;
-    uniform int cellColorIndex; 
-    uniform int userCellColorIndex; 
+    uniform vec4 cellColorQuat; 
+    uniform vec4 userCellColorQuat; 
 
     vec3 ChooseColor( in vec3 nBase )
     {
@@ -72,10 +106,10 @@
     vec4 quatMult( in vec4 p, in vec4 q )
     {
         vec4 r;
-        r.w = + p.w*q.w - p.x*q.x - p.y*q.y - p.z*q.z;
         r.x = + p.w*q.x + p.x*q.w + p.y*q.z - p.z*q.y;
         r.y = + p.w*q.y - p.x*q.z + p.y*q.w + p.z*q.x;
         r.z = + p.w*q.z + p.x*q.y - p.y*q.x + p.z*q.w;
+        r.w = + p.w*q.w - p.x*q.x - p.y*q.y - p.z*q.z;
         return r;
     }
 
@@ -120,6 +154,36 @@
         float b = x*x + y*y - u*u - v*v;
 
         return vec3(r*0.5 + 0.5,g*0.5 + 0.5,b*0.5 + 0.5);
+    }
+
+
+    vec3 StereoProjColor( in vec4 nBase )
+    {
+        vec4 n = quatMult( -vec4(0.5,0.5,0.5,0.5), nBase );
+        float x = n.x;
+        float y = n.y;
+        float z = n.z;
+        float w = n.w;
+        float denom = 1.0-w;
+        float r = x/denom;
+        float g = y/denom;
+        float b = z/denom;
+        float norm = sqrt(r*r+g*g+b*b);
+        r /= norm;
+        g /= norm;
+        b /= norm; 
+        return vec3(r*0.5 + 0.5,g*0.5 + 0.5,b*0.5 + 0.5);
+    }
+
+    float tanh( in float z )
+    {
+      float Z = exp(2.0*z);
+      return (Z - 1.0) / (Z + 1.0);
+    }
+
+    float arcsinh( in float z )
+    {
+      return log(z + sqrt(z*z + 1.0));
     }
 
     // output
@@ -178,11 +242,8 @@
       n3sphere = quatMult( n3sphere, quatInv( p3sphere ) );
       n3sphere = normalize(n3sphere);
 
-      float colorIndex = mod(float(cellColorIndex + userCellColorIndex), 2.0); // glsl mod is weird
-
-      float c = 0.5 * float(colorIndex) + 0.25;
-
-      vec3 col = 0.5*( HopfColor(n3sphere)-vec3(0.5,0.5,0.5) ) + vec3(c,c,c);
+     
+      vec3 col = 0.25*(StereoProjColor(n3sphere) - vec3(0.5,0.5,0.5)) + 0.75*StereoProjColor( quatMult(userCellColorQuat,  cellColorQuat) );
       vColor = col;
 
       // base position
@@ -192,11 +253,13 @@
       // float scaling = 0.760072; /// {5,3,5}
       // float scaling = 0.619712;  /// {4,3,7}
 
-      // vec4 p = projectToHyperboloidH2xR( vec4(position.zyx * scaling, 1.0) ); //0.57735 = tanh(arccosh(sqrt(3/2)))
+      float posx = position.z;
+      float posy = position.y;
+      float posz = position.x; /// ordering from obj to our coords is zyx->xyz
 
       vec3 temp;
-      temp.x = position.z * scaling;  
-      temp.y = position.y * scaling;  /// ordering from obj to our coords is zyx->xyz
+      temp.x = posx * scaling;  
+      temp.y = posy * scaling;  
       temp.z = 1.0; 
 
       vec3 pH2temp = projectToHyperboloidH2( temp ); 
@@ -205,15 +268,25 @@
       // scale cube of (face center) rad 1 so it maps to correct cube in Klein model on w=1,
       // Klein model euclidean dist from 0 = tanh(hyp dist from 0)
 
-
       pH2 = boostH2 * translationH2 * pH2;
-      pH2 = (1.0/pH2.w) * pH2; //project to Klein model here
-      float pR = boostR + translationR + (position.x * globalZScaling);
-      vec4 p = vec4(pH2.x, pH2.y, pR, 1.0); /// ordering from obj to our coords is zyx->xyz
+      // pH2 = (1.0/pH2.w) * pH2; //project to Klein model here  // Not doing this anymore!
+
+      float pR = boostR + translationR + (posz * globalZScaling); 
+
+      // The hyperboloid x R can be modeled by {cosh(v),sinh(v)cos(theta),sinh(v)sin(theta),z} 
+      // where {w,x,y,z} are coordinates in R{3,1} with metric signature {-1,1,1,1}
+      // we find a geodesic in hyperboloid x R as a parametric function of the coordinate map {v,theta,z} 
+      // that starts at the origin at t=0 and goes through the vertex at t=1, 
+      // then find the velocity of the function at t=0. We draw the vertex at this velocity vector. i.e., we 
+      // are taking the inverse of the exponential map, from the space back to the tangent space at (0,0,0,1)
+
+      float pH2rad = sqrt(pH2.x*pH2.x + pH2.y*pH2.y);
+      float arcSinhpH2rad_over_inv_pH2rad = arcsinh(pH2rad)/(pH2rad);
+      vec4 p = vec4(pH2.x * arcSinhpH2rad_over_inv_pH2rad, pH2.y * arcSinhpH2rad_over_inv_pH2rad, pR, 1.0); 
 
       // take the final 3D position and project it onto the screen
 
-      gl_Position = projectionMatrix * modelViewMatrix * p;
+      gl_Position = projectionMatrix * modelViewMatrix * globalCoordChange * p; //globalCoordChange for making the R direction be up on screen
     }
   </script>
 
