@@ -1,0 +1,331 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <title>Hyperbolic tiling</title>
+
+        <!--
+        Hyperbolic space with webVR support. WASD + Arrows to move, space or p to play/pause.
+
+        A websperience by Vi Hart, Andrea Hawksley, and Henry Segerman,
+        using the hyperbolic space prototype developed at a hyperbolic webVR "hackalot"
+        with Vi Hart, Mike Stay, Henry Segerman, Andrea Hawksley, and Andrew Lutomirski,
+        with help from Marc ten Bosch's 4d graphics shader, Jeff Week's Curved Spaces, Mozilla's webVR framework for THREEjs, etc.
+
+        http://vihart.com
+        http://andreahawksley.com
+        http://segerman.org/
+        http://reperiendi.wordpress.com/
+        https://github.com/hawksley
+        http://www.geometrygames.org/CurvedSpaces/
+        http://www.marctenbosch.com
+        https://github.com/MozVR/vr-web-examples/tree/master/threejs-vr-boilerplate
+        -->
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <style>
+            body {
+                background-color: #000;
+                color: #fff;
+                margin: 0px;
+                padding: 0;
+                overflow: hidden;
+            }
+        </style>
+    </head>
+
+    <body>
+   <!--    <div style="
+          position: fixed;
+          top: 50%;
+          right: 50%;
+          padding: 5px;
+          border-right: .5px solid white;
+          border-top: .5px solid white;
+      "></div>
+      <div style="
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          padding: 5px;
+          border-left: .5px solid white;
+          border-top: .5px solid white;
+      "></div>
+       <div style="
+          position: fixed;
+          bottom: 50%;
+          right: 50%;
+          padding: 5px;
+          border-right: .5px solid white;
+          border-bottom: .5px solid white;
+      "></div>
+       <div style="
+          position: fixed;
+          bottom: 50%;
+          left: 50%;
+          padding: 5px;
+          border-left: .5px solid white;
+          border-bottom: .5px solid white;
+      "></div> -->
+    </body>
+
+    <script type="x-shader/x-vertex" id="vertexShader">
+    // This shader moves vertices around
+
+    // input
+    uniform float time; // global time in seconds
+    uniform float globalZScaling;
+    uniform mat4 globalCoordChange;
+    uniform float translationR;
+    uniform mat4 translationH2; 
+    uniform float boostR;
+    uniform mat4 boostH2;
+    // uniform vec3 cellColor;
+    uniform vec4 cellColorQuat; 
+    uniform vec4 userCellColorQuat; 
+
+    vec3 ChooseColor( in vec3 nBase )
+    {
+      float r = nBase.x;
+      float g = nBase.y;
+      float b = nBase.z;
+      float norm = sqrt(r*r+g*g+b*b);
+      r /= norm;
+      g /= norm;
+      b /= norm;
+      // float sin_a = 0.973255;
+      // float cos_a = 0.229727;
+      // float rot_r = cos_a * r + sin_a * g;
+      // float rot_g = -sin_a * r + cos_a * g;
+
+      return vec3(r*0.5 + 0.5,g*0.5 + 0.5,b*0.5 + 0.5);
+    }
+
+    // Quaternion Multiplication
+    vec4 quatMult( in vec4 p, in vec4 q )
+    {
+        vec4 r;
+        r.x = + p.w*q.x + p.x*q.w + p.y*q.z - p.z*q.y;
+        r.y = + p.w*q.y - p.x*q.z + p.y*q.w + p.z*q.x;
+        r.z = + p.w*q.z + p.x*q.y - p.y*q.x + p.z*q.w;
+        r.w = + p.w*q.w - p.x*q.x - p.y*q.y - p.z*q.z;
+        return r;
+    }
+
+    vec4 quatInv( in vec4 p )
+    {
+        vec4 r;
+        r.x = -p.x;
+        r.y = -p.y;
+        r.z = -p.z;
+        r.w = p.w;
+        return r;
+    }
+
+    // Project the vector p to the 3-space perpendicular to q
+    vec4 projVecPerp( in vec4 p, in vec4 q )
+    {
+        vec4 r;
+        float pDotq = p.w*q.w + p.x*q.x + p.y*q.y + p.z*q.z;
+        float qDotq = q.w*q.w + q.x*q.x + q.y*q.y + q.z*q.z;
+        float foo = pDotq / qDotq;
+        r.x = p.x - foo * q.x;
+        r.y = p.y - foo * q.y;
+        r.z = p.z - foo * q.z;
+        r.w = p.w - foo * q.w;
+        return r;
+    }
+
+    // Hopf fibration coloring
+    // returns a color based on the 4D normal
+    vec3 HopfColor( in vec4 nBase )
+    {
+        vec4 n = quatMult( nBase, vec4(0,1,0,0) );  //makes hypTiling monkeys have nicer colours
+
+      // compute the color
+        float y = n.x;
+        float u = n.y;
+        float v = n.z;
+        float x = n.w;
+
+        float r = 2. * (u*x + v*y);
+        float g = 2. * (u*y - v*x);
+        float b = x*x + y*y - u*u - v*v;
+
+        return vec3(r*0.5 + 0.5,g*0.5 + 0.5,b*0.5 + 0.5);
+    }
+
+
+    vec3 StereoProjColor( in vec4 nBase )
+    {
+        vec4 n = quatMult( -vec4(0.5,0.5,0.5,0.5), nBase );
+        float x = n.x;
+        float y = n.y;
+        float z = n.z;
+        float w = n.w;
+        float denom = 1.0-w;
+        float r = x/denom;
+        float g = y/denom;
+        float b = z/denom;
+        float norm = sqrt(r*r+g*g+b*b);
+        r /= norm;
+        g /= norm;
+        b /= norm; 
+        return vec3(r*0.5 + 0.5,g*0.5 + 0.5,b*0.5 + 0.5);
+    }
+
+    float tanh( in float z )
+    {
+      float Z = exp(2.0*z);
+      return (Z - 1.0) / (Z + 1.0);
+    }
+
+    float arcsinh( in float z )
+    {
+      return log(z + sqrt(z*z + 1.0));
+    }
+
+    // output
+    varying vec3 vColor; // this shader computes the color of each vertex
+
+    // vec4 projectToHyperboloid(vec4 v) {
+    //   float scaleFactor = sqrt(v.w * v.w - v.x * v.x - v.y * v.y - v.z * v.z);
+
+    //   vec4 result;
+    //   result.x = v.x / scaleFactor;
+    //   result.y = v.y / scaleFactor;
+    //   result.z = v.z / scaleFactor;
+    //   result.w = v.w / scaleFactor;
+    //   return result;
+    // }
+
+    vec3 projectToHyperboloidH2(vec3 v) {
+      float scaleFactor = sqrt(v.z * v.z - v.x * v.x - v.y * v.y);
+
+      vec3 result;
+      result.x = v.x / scaleFactor;
+      result.y = v.y / scaleFactor;
+      result.z = v.z / scaleFactor;
+      return result;
+    }
+
+////// scaling regular euclidean polyhedron with face center at dist 1 from center so that it projects onto hyperboloid
+////// correctly:
+
+////// for cube, tiling {4,3,n}
+
+//////  polyhedron center          d
+//////                    pi/4 ---------. pi/2  face center
+//////                         "-_      |
+//////                            "-_   |
+//////                               "-_. pi/n  edge center
+
+//////  scale so that in Klein model 1 becomes d.
+
+//////  hyp dist d, cosh(d) = cd = cos(pi/n) / sin(pi/4) by hyperbolic law of cosines.
+//////  In Klein model, d becomes tanh(arccosh(cd)) = sqrt(cd*cd-1)/cd
+
+//////  For dodec, centerAngle = 0.55357435889704525151 = ArcCos[(1/2) Sqrt[(5/2) + 11 Sqrt[5]/10] / ((3 + Sqrt[5])/4)]
+
+    // float meshScalingFactor( float edgeAngle, float centerAngle ) {
+    //   float d = Math.cos(edgeAngle) / Math.sin(centerAngle);
+    //   return Math.sqrt(d*d-1.0)/d;
+    // }
+
+    void main()
+    {
+      //use S^3 quaternion pullback to get consistent texturing
+      vec4 p3sphere = normalize( vec4(position.zyx, 1.0) );
+      vec4 n3sphere = vec4( normal.zyx, 0.0);
+      n3sphere = projVecPerp(  n3sphere, p3sphere );
+      n3sphere = quatMult( n3sphere, quatInv( p3sphere ) );
+      n3sphere = normalize(n3sphere);
+
+     
+      vec3 col = 0.25*(StereoProjColor(n3sphere) - vec3(0.5,0.5,0.5)) + 0.75*StereoProjColor( quatMult(userCellColorQuat,  cellColorQuat) );
+      vColor = col;
+
+      // base position
+      // float scaling = meshScalingFactor( 0.523, 0.785 );
+      float scaling = 0.57735;  /// {4,3,6}, or {4,6} for H2xR. 0.57735 = tanh(arccosh(sqrt(3/2)))
+      // float scaling = 0.66874;  /// {5,3,4}
+      // float scaling = 0.760072; /// {5,3,5}
+      // float scaling = 0.619712;  /// {4,3,7}
+
+      float posx = position.z;
+      float posy = position.y;
+      float posz = position.x; /// ordering from obj to our coords is zyx->xyz
+
+      vec3 temp;
+      temp.x = posx * scaling;  
+      temp.y = posy * scaling;  
+      temp.z = 1.0; 
+
+      vec3 pH2temp = projectToHyperboloidH2( temp ); 
+      vec4 pH2 = vec4(pH2temp.x, pH2temp.y, 0.0, pH2temp.z);
+
+      // scale cube of (face center) rad 1 so it maps to correct cube in Klein model on w=1,
+      // Klein model euclidean dist from 0 = tanh(hyp dist from 0)
+
+      pH2 = boostH2 * translationH2 * pH2;
+      // pH2 = (1.0/pH2.w) * pH2; //project to Klein model here  // Not doing this anymore!
+
+      float pR = boostR + translationR + (posz * globalZScaling); 
+
+      // The hyperboloid x R can be modeled by {cosh(v),sinh(v)cos(theta),sinh(v)sin(theta),z} 
+      // where {w,x,y,z} are coordinates in R{3,1} with metric signature {-1,1,1,1}
+      // we find a geodesic in hyperboloid x R as a parametric function of the coordinate map {v,theta,z} 
+      // that starts at the origin at t=0 and goes through the vertex at t=1, 
+      // then find the velocity of the function at t=0. We draw the vertex at this velocity vector. i.e., we 
+      // are taking the inverse of the exponential map, from the space back to the tangent space at (0,0,0,1)
+
+      float pH2rad = sqrt(pH2.x*pH2.x + pH2.y*pH2.y);
+      float arcSinhpH2rad_over_inv_pH2rad = arcsinh(pH2rad)/(pH2rad);
+      vec4 p = vec4(pH2.x * arcSinhpH2rad_over_inv_pH2rad, pH2.y * arcSinhpH2rad_over_inv_pH2rad, pR, 1.0); 
+
+      // take the final 3D position and project it onto the screen
+
+      gl_Position = projectionMatrix * modelViewMatrix * globalCoordChange * p; //globalCoordChange for making the R direction be up on screen
+    }
+  </script>
+
+  <script type="x-shader/x-vertex" id="fragmentShader">
+    // this gets called once per pixel
+    varying vec3 vColor;
+    void main()
+    {
+      // just use the color we computed and assign it to this pixel
+      gl_FragColor = vec4( vColor, 1. );
+    }
+  </script>
+
+    <!--
+    three.js 3d library
+    -->
+    <script src="js/lib/three.min.js"></script>
+
+    <script src="js/hypMathH2xR.js"></script>
+    <!--
+    VRControlsHyperbolic.js acquires positional information from connected VR devices and applies the transformations to a three.js camera object. Also deals with hyperbolic and parabolic motions.
+     -->
+     <script src="js/vr/PhoneVR.js"></script>
+    <script src="js/vr/VRControlsHyperbolicH2xR.js"></script>
+
+    <!--
+    VREffect.js handles stereo camera setup and rendering.
+    -->
+    <script src="js/vr/VREffect.js"></script>
+
+    <script src="js/loaders/OBJLoader.js"></script>
+        <!--
+    dodec_no_id.js stores hyperbolic translation matrices to make copies of the dodecahedron.
+    -->
+    <script src="js/46H2xR.js"></script>
+    <!--
+    <script src="js/534Reflect.js"></script>
+  -->
+
+    <script src="js/hypTilingH2xR.js" type="text/javascript" id="mainCode"></script>
+
+</html>
