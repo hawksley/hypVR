@@ -117,11 +117,6 @@ function updateBigMatArray(){
 }
 
 function loadStuff(){ 
-
-  
-
-  
-
   var manager = new THREE.LoadingManager();
   var loader = new THREE.OBJLoader(manager);
   
