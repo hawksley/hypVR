@@ -8,6 +8,7 @@ THREE.VRControls = function ( camera, done ) {
 
 	this._camera = camera;
 	this._oldVRState;
+	this._defaultPosition = [0,0,0];
 
 	this._init = function () {
 		var self = this;
@@ -89,7 +90,7 @@ THREE.VRControls = function ( camera, done ) {
 		///do translation
 		var m;
 		var offset;
-		if (vrState !== null && vrState.hmd.lastPosition !== undefined) {
+		if (vrState !== null && vrState.hmd.lastPosition !== undefined && vrState.hmd.position[0] !== 0) {
 			offset = new THREE.Vector3();
 			offset.x = vrState.hmd.lastPosition[0] - vrState.hmd.position[0];
 			offset.y = vrState.hmd.lastPosition[1] - vrState.hmd.position[1];
@@ -175,8 +176,8 @@ THREE.VRControls = function ( camera, done ) {
 
 		if ( vrInput ) {
 			if (vrInput.getState !== undefined) {
-				orientation	= vrInput.getState().orientation;
-				orientation = [orientation.x, orientation.y, orientation.z, orientation.w];
+				var rotation	= vrInput.getState().orientation;
+				orientation = [rotation.x, rotation.y, rotation.z, rotation.w];
 				position = vrInput.getState().position;
 				position = [position.x, position.y, position.z];
 			} else {
@@ -184,8 +185,8 @@ THREE.VRControls = function ( camera, done ) {
 				position = vrInput.getPose().position;
 			}
 		} else if (this.phoneVR.rotationQuat()) {
-			orientation = this.phoneVR.rotationQuat();
-			orientation = [orientation.x, orientation.y, orientation.z, orientation.w];
+			var rotation = this.phoneVR.rotationQuat();
+			orientation = [rotation.x, rotation.y, rotation.z, rotation.w];
 			position = this._defaultPosition;
 		} else {
 			return null;
