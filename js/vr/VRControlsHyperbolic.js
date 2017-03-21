@@ -221,7 +221,6 @@ THREE.VRControls = function ( camera, done ) {
 };
 
 var fixOutside = true; //moves you back inside the central cell if you leave it
-var vrMode = false;
 /*
 Listen for double click event to enter full-screen VR mode
 */
@@ -240,8 +239,7 @@ function onkey(event) {
   } else if (event.keyCode == 70 || event.keyCode == 13) { //f
     effect.setFullScreen(true); //fullscreen
   } else if (event.keyCode == 86 || event.keyCode == 13 || event.keyCode == 32 ) { // v or 'enter' or 'space' for VR mode
-    vrMode = !vrMode;
-    effect.setVRMode(vrMode);
+    effect.toggleVRMode();
   } else if (event.keyCode == 84) { // t
   	fixOutside = !fixOutside;
   }	else if (event.keyCode == 82) { // r

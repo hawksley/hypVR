@@ -107,26 +107,28 @@ THREE.VREffect = function ( renderer, done ) {
 
 	this._init();
 
-	this.render = function ( scene, camera ) {
+	this.render = function ( scene, camera, animate ) {
 		var renderer = this._renderer;
 		var vrHMD = this._vrHMD;
 		renderer.setScissorTest( false );
 		// VR render mode if HMD is available
 		if ( vrHMD ) {
-			this.renderStereo.apply( this, arguments );
+			vrHMD.requestAnimationFrame(animate);
+			this.renderStereo.apply( this, [scene, camera] );
 			if (vrHMD.submitFrame !== undefined) {
 				vrHMD.submitFrame();
 			}
 			return;
 		}
 
+		requestAnimationFrame(animate);
 		if (this.phoneVR.deviceAlpha !== null) { //default to stereo render for devices with orientation sensor, like mobile
-			this.renderStereo.apply( this, arguments );
+			this.renderStereo.apply( this, [scene, camera] );
 			return;
 		}
 
 		// Regular render mode if not HMD
-		renderer.render.apply( this._renderer, arguments );
+		renderer.render.apply( this._renderer, [scene, camera] );
 	};
 
 	this.renderStereo = function( scene, camera, renderTarget, forceClear ) {
@@ -177,15 +179,29 @@ THREE.VREffect = function ( renderer, done ) {
 		renderer.setSize( width, height );
 	};
 
-	this.setVRMode = function (enable) {
+	var _vrMode = false;
+	this.toggleVRMode = function () {
 		var vrHMD = this._vrHMD;
 		var canvas = renderer.domElement;
 
-		if (enable) {
+		if (!vrHMD) {
+			return;
+		}
+
+		this._vrMode = !this._vrMode
+		if (this._vrMode) {
 			vrHMD.requestPresent([{source: canvas, leftBounds: [0.0, 0.0, 0.5, 1.0], rightBounds: [0.5, 0.0, 0.5, 1.0]}]);
 		} else {
 			vrHMD.exitPresent();
 		}
+	}
+
+	this.getVRMode = function() {
+		return this._vrMode;
+	}
+
+	this.getVRHMD = function() {
+		return this._vrHMD;
 	}
 
 	this.setFullScreen = function( enable ) {

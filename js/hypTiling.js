@@ -105,7 +105,7 @@ function init() {
   // infoSprite.rotation.x = -.3;
   // scene.add( infoSprite );
 
-  effect.render(scene, camera);
+  effect.render(scene, camera, animate);
 }
 
 function updateBigMatArray(){
@@ -117,11 +117,6 @@ function updateBigMatArray(){
 }
 
 function loadStuff(){ 
-
-  
-
-  
-
   var manager = new THREE.LoadingManager();
   var loader = new THREE.OBJLoader(manager);
   
@@ -249,8 +244,8 @@ function animate() {
     }
   }
   
-  effect.render(scene, camera);
-  requestAnimationFrame(animate);
+  effect.render(scene, camera, animate);
+  // requestAnimationFrame(animate);
 }
 
 document.addEventListener('keydown', function(event) { selectShape(event); }, false);
