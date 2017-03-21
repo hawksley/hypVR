@@ -122,10 +122,10 @@ THREE.VREffect = function ( renderer, done ) {
 		}
 
 		requestAnimationFrame(animate);
-		if (this.phoneVR.deviceAlpha !== null) { //default to stereo render for devices with orientation sensor, like mobile
-			this.renderStereo.apply( this, [scene, camera] );
-			return;
-		}
+		// if (this.phoneVR.deviceAlpha !== null) { //default to stereo render for devices with orientation sensor, like mobile
+		// 	this.renderStereo.apply( this, [scene, camera] );
+		// 	return;
+		// }
 
 		// Regular render mode if not HMD
 		renderer.render.apply( this._renderer, [scene, camera] );
