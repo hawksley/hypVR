@@ -273,6 +273,14 @@ function key(event, sign) {
 document.addEventListener('keydown', function(event) { key(event, 1); }, false);
 document.addEventListener('keyup', function(event) { key(event, -1); }, false);
 
+//tap and hold to move
+function tap(event, sign) {
+    controls.manualMoveRate[0] += sign;
+}
+
+document.addEventListener('touchstart', function(event) { tap(event, 1); }, false);
+document.addEventListener('touchend', function(event) { tap(event, -1); }, false);
+
 /*
 Handle window resizes
 */
