@@ -181,8 +181,8 @@ THREE.VRControls = function ( camera, done ) {
 				position = vrInput.getState().position;
 				position = [position.x, position.y, position.z];
 			} else {
-				orientation	= vrInput.getPose().orientation;
-				position = vrInput.getPose().position;
+				orientation	= vrInput.getFrameData().orientation;
+				position = vrInput.getFrameData().position;
 			}
 		} else if (this.phoneVR.rotationQuat()) {
 			var rotation = this.phoneVR.rotationQuat();
