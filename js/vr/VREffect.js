@@ -65,8 +65,10 @@ THREE.VREffect = function ( renderer, done ) {
 					var parametersRight = vrHMD.getEyeParameters( "right" );
 					self.leftEyeTranslation = parametersLeft.offset;
 					self.rightEyeTranslation = parametersRight.offset;
-					self.leftEyeFOV = parametersLeft.fieldOfView;
-					self.rightEyeFOV = parametersRight.fieldOfView;
+					if (parametersLeft.fieldOfView !== undefined) {
+						self.leftEyeFOV = parametersLeft.fieldOfView;
+						self.rightEyeFOV = parametersRight.fieldOfView;
+					}
 					break; // We keep the first we encounter
 				}
 			}
