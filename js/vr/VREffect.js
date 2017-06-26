@@ -120,7 +120,7 @@ THREE.VREffect = function ( renderer, done ) {
 			vrHMD.requestAnimationFrame(animate);
 			this.renderStereo.apply( this, [scene, camera] );
 			if (vrHMD.submitFrame !== undefined && this._vrMode) {
-				vrHMD.getAnimationFrame(frameData);
+				// vrHMD.getAnimationFrame(frameData);
 				vrHMD.submitFrame();
 			}
 			return;
