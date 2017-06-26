@@ -27,6 +27,8 @@ THREE.VREffect = function ( renderer, done ) {
 	var cameraLeft = new THREE.PerspectiveCamera();
 	var cameraRight = new THREE.PerspectiveCamera();
 
+	var frameData = new VRFrameData();
+
 	this._renderer = renderer;
 
 	this._init = function() {
@@ -65,8 +67,10 @@ THREE.VREffect = function ( renderer, done ) {
 					var parametersRight = vrHMD.getEyeParameters( "right" );
 					self.leftEyeTranslation = parametersLeft.offset;
 					self.rightEyeTranslation = parametersRight.offset;
-					self.leftEyeFOV = parametersLeft.fieldOfView;
-					self.rightEyeFOV = parametersRight.fieldOfView;
+					if (parametersLeft.fieldOfView !== undefined) {
+						self.leftEyeFOV = parametersLeft.fieldOfView;
+						self.rightEyeFOV = parametersRight.fieldOfView;
+					}
 					break; // We keep the first we encounter
 				}
 			}
@@ -115,7 +119,8 @@ THREE.VREffect = function ( renderer, done ) {
 		if ( vrHMD ) {
 			vrHMD.requestAnimationFrame(animate);
 			this.renderStereo.apply( this, [scene, camera] );
-			if (vrHMD.submitFrame !== undefined) {
+			if (vrHMD.submitFrame !== undefined && this._vrMode) {
+				// vrHMD.getAnimationFrame(frameData);
 				vrHMD.submitFrame();
 			}
 			return;
