@@ -32,7 +32,7 @@ var rotz = new THREE.Matrix4().makeRotationZ( Math.PI/2 );
 var rotzi = new THREE.Matrix4().makeRotationZ( -Math.PI/2 );
 
 
-var tilingGens =
+window.tilingGens =
 [
 new THREE.Matrix4().identity(),  //id matrix
 rotxi.multiply( translateByVector(new THREE.Vector3(dist,0,0)) ),
@@ -43,7 +43,7 @@ rotzi.multiply( translateByVector(new THREE.Vector3(0,0,dist)) ),
 rotz.multiply( translateByVector(new THREE.Vector3(0,0,-dist)) )
 ];  ///these multiplies are consistent with left hand screw monkeys
 
-var genQuatsColourSchemes = 
+window.genQuatsColourSchemes = 
 [
   [ //// 8 colours untwisted
   new THREE.Quaternion(0,0,0,1),
@@ -74,7 +74,7 @@ var genQuatsColourSchemes =
   ]
 ];
 
-function word2colorQuat(word) {
+window.word2colorQuat = function word2colorQuat(word) {
     // word is a list of indexes into tilingGens
     var quat = new THREE.Quaternion(0,0,0,1);
     for (var j = 0; j < word.length; j++){  

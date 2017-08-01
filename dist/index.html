@@ -37,6 +37,32 @@
 
     <body></body>
 
+<!-- This entire block in only to facilitate dynamically enabling and
+    disabling the WebVR polyfill, and is not necessary for most WebVR apps.
+    If you want to use the polyfill in your app, just include the js file and
+    everything will work the way you want it to by default. -->
+    <script>
+      var WebVRConfig = {
+        // Prevents the polyfill from initializing automatically.
+        DEFER_INITIALIZATION: true,
+	FORCE_ENABLE_VR: true,      
+        // Ensures the polyfill is always active when initialized, even if the
+        // native API is available. This is probably NOT what most pages want.
+        ALWAYS_APPEND_POLYFILL_DISPLAY: true,
+      }
+    </script>
+    <script src="js/third-party/webvr-polyfill.js"></script>
+    <script src="js/third-party/wglu/wglu-url.js"></script>
+    <script>
+      // Dynamically turn the polyfill on if requested by the query args.
+      if (WGLUUrl.getBool('polyfill', false)) {
+        InitializeWebVRPolyfill();
+      } else {
+        // Shim for migration from older version of WebVR. Shouldn't be necessary for very long.
+        WebVRPolyfill.InstallWebVRSpecShim();
+      }
+    </script>
+
     <script type="x-shader/x-vertex" id="vertexShader">
     // This shader moves vertices around
 
@@ -222,32 +248,10 @@
     }
   </script>
 
-    <!--
-    three.js 3d library
-    -->
-    <script src="js/lib/three.min.js"></script>
 
-    <script src="js/hypMath.js"></script>
-    <!--
-    VRControlsHyperbolic.js acquires positional information from connected VR devices and applies the transformations to a three.js camera object. Also deals with hyperbolic and parabolic motions.
-     -->
-     <script src="js/vr/PhoneVR.js"></script>
-    <script src="js/vr/VRControlsHyperbolic.js"></script>
-
-    <!--
-    VREffect.js handles stereo camera setup and rendering.
-    -->
-    <script src="js/vr/VREffect.js"></script>
-
-    <script src="js/loaders/OBJLoader.js"></script>
-        <!--
-    dodec_no_id.js stores hyperbolic translation matrices to make copies of the dodecahedron.
-    -->
-    <script src="js/436.js"></script>
-    <!--
-    <script src="js/534Reflect.js"></script>
-  -->
-
-    <script src="js/hypTiling.js" type="text/javascript" id="mainCode"></script>
-
+   <!-- 
+	Bundled App (Concatenated and Minified) 
+	Libraries, dependencies and Main code
+   -->
+   <script src="./index.bundle.js" id="mainCode"></script>
 </html>

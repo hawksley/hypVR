@@ -4,7 +4,7 @@
 // Even Chromium on the desktop has a 'deviceorientation' event, and it will fire once with
 // all nulls.
 
-function PhoneVR() {
+window.PhoneVR = function PhoneVR() {
     this.deviceAlpha = null;
     this.deviceGamma = null;
     this.deviceBeta = null;

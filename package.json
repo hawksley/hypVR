@@ -4,7 +4,8 @@
   "description": "Hyperbolic space with webVR support. WASD + Arrows to move, space or p to play/pause. Numbers 1-9 give different models.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack"
   },
   "repository": {
     "type": "git",

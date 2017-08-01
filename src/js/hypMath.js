@@ -14,7 +14,7 @@ THREE.Matrix4.prototype.add = function (m) {
 // 	return true;
 // }
 
-function areSameMatrix(mat1, mat2) {  //look only at last column - center of cell
+window.areSameMatrix = function areSameMatrix(mat1, mat2) {  //look only at last column - center of cell
 	var delta = 0.01;
 	for (var coord=3; coord<16; coord+=4) {
 		if (Math.abs(mat1.elements[coord] - mat2.elements[coord]) > delta) {
@@ -27,7 +27,7 @@ function areSameMatrix(mat1, mat2) {  //look only at last column - center of cel
 	return true;
 }
 
-function isMatrixInArray(mat, matArray) {
+window.isMatrixInArray = function isMatrixInArray(mat, matArray) {
 	for (var i=0; i<matArray.length; i++) {
 		if (areSameMatrix(mat, matArray[i])) {
 		// if (i > 3) {
@@ -43,7 +43,7 @@ function isMatrixInArray(mat, matArray) {
 // 	return Math.atanh(Math.sqrt((v.x*v.x + v.y*v.y + v.z*v.z) / (v.w*v.w)));
 // }  //dont need this for calculating nearest point to origin - atanh is increasing function
 
-function digitsDepth( digits ) {
+window.digitsDepth = function digitsDepth( digits ) {
 	numZeros = 0;
 	for (var i = 0; i < digits.length; i++) {
 		if ( digits[i] == 0 ) {
@@ -53,7 +53,7 @@ function digitsDepth( digits ) {
 	return digits.length - numZeros;
 }
 
-function makeTsfmsList( tilingGens, tilingDepth ) {
+window.makeTsfmsList = function makeTsfmsList( tilingGens, tilingDepth ) {
 	var numTsfmsEachDepth = [];
 	var cumulativeNumTsfms = [];
 	for (var l = 0; l < tilingDepth + 1; l++) {  //initialise array to zeros
@@ -92,7 +92,7 @@ function makeTsfmsList( tilingGens, tilingDepth ) {
 	return [tsfms, words, cumulativeNumTsfms];
 }
 
-function translateByVector(v) { // trickery stolen from Jeff Weeks' Curved Spaces app
+window.translateByVector = function translateByVector(v) { // trickery stolen from Jeff Weeks' Curved Spaces app
   var dx = v.x;
   var dy = v.y;
   var dz = v.z;
@@ -116,7 +116,7 @@ function translateByVector(v) { // trickery stolen from Jeff Weeks' Curved Space
   return result;
 }
 
-function parabolicBy2DVector(v) {  ///  something is wrong here we think...
+window.parabolicBy2DVector = function parabolicBy2DVector(v) {  ///  something is wrong here we think...
   var dx = v.x; /// first make parabolic fixing point at infinity in pos z direction
   var dy = v.y;
   var m = new THREE.Matrix4().set(
@@ -137,19 +137,19 @@ function parabolicBy2DVector(v) {  ///  something is wrong here we think...
   return cameraM.multiply(result).multiply(cameraMinv);
 }
 
-function getFwdVector() {
+window.getFwdVector = function getFwdVector() {
   return new THREE.Vector3(0,0,1).applyQuaternion(camera.quaternion);
 }
-function getRightVector() {
+window.getRightVector = function getRightVector() {
   return new THREE.Vector3(-1,0,0).applyQuaternion(camera.quaternion);
 }
-function getUpVector() {
+window.getUpVector = function getUpVector() {
   return new THREE.Vector3(0,-1,0).applyQuaternion(camera.quaternion);
 }
 
 // fastGramSchmidt from Jeff Week's CurvedSpaces. Causes some wobble when far from the origin...
 
-function fastGramSchmidt( m )
+window.fastGramSchmidt = function fastGramSchmidt( m )
 {
 	//	Numerical errors can accumulate and force aMatrix "out of round",
 	//	in the sense that its rows are no longer orthonormal.
@@ -216,15 +216,19 @@ function fastGramSchmidt( m )
 
 ///// better GramSchmidt...seem more stable out near infinity
 
-function lorentzDot( u, v ){
+window.lorentzDot = function lorentzDot( u, v ){
 	return u[0]*v[0] + u[1]*v[1] + u[2]*v[2] - u[3]*v[3];
 }
 
-function norm( v ){
+window.norm = function norm( v ){
 	return Math.sqrt(Math.abs(lorentzDot(v,v)));
 }
+Array.prototype.subarray=function(start,end){
+     if(!end){ end=-1;} 
+    return this.slice(start, this.length+1-(end*-1));
+}
 
-function gramSchmidt( m ){
+window.gramSchmidt = function gramSchmidt( m ){
 	// var m = mat.elements; 
 	for (var i = 0; i<4; i++) {  ///normalise row
 		var invRowNorm = 1.0 / norm( m.subarray(4*i, 4*i+4) );
@@ -244,11 +248,11 @@ function gramSchmidt( m ){
 
 ////////check if we are still inside the central fund dom...
 
-function fakeDist( v ){  //good enough for comparison of distances on the hyperboloid
+window.fakeDist = function fakeDist( v ){  //good enough for comparison of distances on the hyperboloid
 	return v.x*v.x + v.y*v.y + v.z*v.z;
 }
 
-function fixOutsideCentralCell( mat, gens ) {
+window.fixOutsideCentralCell = function fixOutsideCentralCell( mat, gens ) {
 	//assume first in Gens is identity, should probably fix when we get a proper list of matrices
 	var cPos = new THREE.Vector4(0,0,0,1).applyMatrix4( mat ); //central
 	var bestDist = fakeDist(cPos);

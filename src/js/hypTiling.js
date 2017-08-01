@@ -10,7 +10,7 @@ var controls;
 var clicky = 0;
 var mouseX = 1;
 var mouseY = 1;
-var currentBoost = new THREE.Matrix4().set(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
+window.currentBoost = new THREE.Matrix4().set(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
 
 var decorationArray = [
   'cube', 
@@ -26,7 +26,7 @@ var decorationArray = [
   ];
 
 var decoration = "truncatedCube";
-var colourMode = 0;
+window.colourMode = 0;
 
 var doubleSided = false;
 
