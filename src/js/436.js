@@ -43,7 +43,7 @@ rotzi.multiply( translateByVector(new THREE.Vector3(0,0,dist)) ),
 rotz.multiply( translateByVector(new THREE.Vector3(0,0,-dist)) )
 ];  ///these multiplies are consistent with left hand screw monkeys
 
-window.genQuatsColourSchemes = 
+window.genQuatsColourSchemes =
 [
   [ //// 8 colours untwisted
   new THREE.Quaternion(0,0,0,1),
@@ -62,7 +62,7 @@ window.genQuatsColourSchemes =
   new THREE.Quaternion(0,-1,0,0),
   new THREE.Quaternion(0,0,1,0),
   new THREE.Quaternion(0,0,-1,0)
-  ], 
+  ],
   [ //// 2 colours
   new THREE.Quaternion(0,0,0,1),
   new THREE.Quaternion(0,0,0,-1),
@@ -77,11 +77,8 @@ window.genQuatsColourSchemes =
 window.word2colorQuat = function word2colorQuat(word) {
     // word is a list of indexes into tilingGens
     var quat = new THREE.Quaternion(0,0,0,1);
-    for (var j = 0; j < word.length; j++){  
-        quat.multiply( genQuatsColourSchemes[colourMode][word[j]] ) 
+    for (var j = 0; j < word.length; j++){
+        quat.multiply( genQuatsColourSchemes[colourMode][word[j]] )
     }
     return quat;
 }
-
-
-

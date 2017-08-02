@@ -44,11 +44,11 @@ window.isMatrixInArray = function isMatrixInArray(mat, matArray) {
 // }  //dont need this for calculating nearest point to origin - atanh is increasing function
 
 window.digitsDepth = function digitsDepth( digits ) {
-	numZeros = 0;
+	var numZeros = 0;
 	for (var i = 0; i < digits.length; i++) {
 		if ( digits[i] == 0 ) {
 			numZeros += 1;
-		} 
+		}
 	}
 	return digits.length - numZeros;
 }
@@ -82,7 +82,7 @@ window.makeTsfmsList = function makeTsfmsList( tilingGens, tilingDepth ) {
 	      numTsfmsEachDepth[digitsDepth(digits)] += 1;
 	    }
 	}
-	
+
 	for (var i = 0; i < tilingDepth; i++){
 		cumulativeNumTsfms[i] = numTsfmsEachDepth[i];
 		if (i>0){
@@ -129,7 +129,7 @@ window.parabolicBy2DVector = function parabolicBy2DVector(v) {  ///  something i
   var result = new THREE.Matrix4().identity();
   result.add(m);
   result.add(m2);
-  //now conjugate to get based on camera orientation  
+  //now conjugate to get based on camera orientation
   var cameraM = new THREE.Matrix4();
   cameraM.makeRotationFromQuaternion(camera.quaternion);
   var cameraMinv = new THREE.Matrix4().getInverse(cameraM);
@@ -173,7 +173,7 @@ window.fastGramSchmidt = function fastGramSchmidt( m )
 	//	Normalize each row to unit length.
 	for (var i = 0; i < 4; i++)
 	{
-		var metric; 
+		var metric;
 		if (i==3){
 			metric = timeLike;
 		}
@@ -193,7 +193,7 @@ window.fastGramSchmidt = function fastGramSchmidt( m )
 	//	Make the rows orthogonal.
 	for (var i = 4; i-- > 0; )	//	leaves the last row untouched
 	{
-		var metric; 
+		var metric;
 		if (i==3){
 			metric = timeLike;
 		}
@@ -224,12 +224,12 @@ window.norm = function norm( v ){
 	return Math.sqrt(Math.abs(lorentzDot(v,v)));
 }
 Array.prototype.subarray=function(start,end){
-     if(!end){ end=-1;} 
+     if(!end){ end=-1;}
     return this.slice(start, this.length+1-(end*-1));
 }
 
 window.gramSchmidt = function gramSchmidt( m ){
-	// var m = mat.elements; 
+	// var m = mat.elements;
 	for (var i = 0; i<4; i++) {  ///normalise row
 		var invRowNorm = 1.0 / norm( m.subarray(4*i, 4*i+4) );
 		for (var l = 0; l<4; l++) {
@@ -257,7 +257,7 @@ window.fixOutsideCentralCell = function fixOutsideCentralCell( mat, gens ) {
 	var cPos = new THREE.Vector4(0,0,0,1).applyMatrix4( mat ); //central
 	var bestDist = fakeDist(cPos);
 	var bestIndex = 0;
-	for (var i=1; i < gens.length; i++){  
+	for (var i=1; i < gens.length; i++){
 		pos = new THREE.Vector4(0,0,0,1).applyMatrix4( gens[i] ).applyMatrix4( mat );
 		if (fakeDist(pos) < bestDist) {
 			bestDist = fakeDist(pos);
@@ -267,12 +267,8 @@ window.fixOutsideCentralCell = function fixOutsideCentralCell( mat, gens ) {
 	if (bestIndex != 0){
 		mat = mat.multiply(gens[bestIndex]);
         return bestIndex;
-	}			
+	}
     else {
         return false;
     }
 }
-
-
-
-

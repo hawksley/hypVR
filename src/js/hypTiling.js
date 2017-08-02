@@ -13,12 +13,12 @@ var mouseY = 1;
 window.currentBoost = new THREE.Matrix4().set(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
 
 var decorationArray = [
-  'cube', 
+  'cube',
   'cubeThickEdges',
-  'truncatedCube', 
+  'truncatedCube',
   'truncatedCubeTrisOnly',
-  'truncatedCubeBdry', 
-  'cubeDual', 
+  'truncatedCubeBdry',
+  'cubeDual',
   'monkey',
   'monkey2',
   'monkey3'
@@ -45,7 +45,7 @@ var bigMatArray;
 var movedTowardsCentralCubeThisFrameIndex = false;
 
 function init() {
-  start = Date.now();
+  var start = Date.now();
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 100);
   camera.position.x = 0;
@@ -85,7 +85,7 @@ function init() {
     vertexShader: document.getElementById('vertexShader').textContent,
     fragmentShader: document.getElementById('fragmentShader').textContent
   });
-  
+
   if (doubleSided) {
     materialBase.side = THREE.DoubleSide;
   }
@@ -95,8 +95,8 @@ function init() {
   loadStuff();
 
   ////// create info overlay
-  // var infoText = THREE.ImageUtils.loadTexture( "media/twelve-ui.png" ); 
-  // var infoMaterial = new THREE.MeshBasicMaterial( {map: infoText, wireframe: false, color: 0x777777 }); 
+  // var infoText = THREE.ImageUtils.loadTexture( "media/twelve-ui.png" );
+  // var infoMaterial = new THREE.MeshBasicMaterial( {map: infoText, wireframe: false, color: 0x777777 });
   // var infoBox = new THREE.BoxGeometry(2,1,1);
   // infoSprite = new THREE.Mesh( infoBox, infoMaterial );
   // infoSprite.position.z = -2;
@@ -116,10 +116,10 @@ function updateBigMatArray(){
   }
 }
 
-function loadStuff(){ 
+function loadStuff(){
   var manager = new THREE.LoadingManager();
   var loader = new THREE.OBJLoader(manager);
-  
+
   if (decoration == "monkey" || decoration == "monkey2" || decoration == "monkey3"){
     numObjects = 2;
     updateBigMatArray();
@@ -212,7 +212,7 @@ function loadStuff(){
     // bigMatArray[i].visible = phraseOnOffMaps[currentPhrase][k];
     }
   }
-} 
+}
 
 
 function animate() {
@@ -225,10 +225,10 @@ function animate() {
       bigMatArray[i].uniforms['boost'].value = currentBoost;
       // console.log(bigMatArray[i].uniforms['userCellColorQuat'].value);
       if (movedTowardsCentralCubeThisFrameIndex != false) {
-        
+
         var tempQuat = new THREE.Quaternion();
         tempQuat.copy(bigMatArray[i].uniforms['userCellColorQuat'].value);
-        tempQuat.multiply(genQuatsColourSchemes[colourMode][movedTowardsCentralCubeThisFrameIndex]);      
+        tempQuat.multiply(genQuatsColourSchemes[colourMode][movedTowardsCentralCubeThisFrameIndex]);
 
         bigMatArray[i].uniforms['userCellColorQuat'].value = tempQuat;
         /// always act on a uniform by setting it equal to something, other stuff breaks in incomprehensible ways...
@@ -243,7 +243,7 @@ function animate() {
     // bigMatArray[i].visible = phraseOnOffMaps[currentPhrase][k];
     }
   }
-  
+
   effect.render(scene, camera, animate);
   // requestAnimationFrame(animate);
 }
@@ -269,7 +269,7 @@ document.addEventListener('keydown', function(event) { changeColourMode(event); 
 
 function changeColourMode(event) {
 
-  var keySelect = event.keyCode; 
+  var keySelect = event.keyCode;
 
   if (keySelect == 67){  //c
      if (scene) {

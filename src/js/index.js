@@ -10,4 +10,3 @@ require('./loaders/OBJLoader.js');
 require('./436.js');
 // Main Code
 require('./hypTiling.js');
-

@@ -45,7 +45,7 @@
       var WebVRConfig = {
         // Prevents the polyfill from initializing automatically.
         DEFER_INITIALIZATION: true,
-	FORCE_ENABLE_VR: true,      
+	      FORCE_ENABLE_VR: true,
         // Ensures the polyfill is always active when initialized, even if the
         // native API is available. This is probably NOT what most pages want.
         ALWAYS_APPEND_POLYFILL_DISPLAY: true,
@@ -59,7 +59,7 @@
         InitializeWebVRPolyfill();
       } else {
         // Shim for migration from older version of WebVR. Shouldn't be necessary for very long.
-        WebVRPolyfill.InstallWebVRSpecShim();
+        InstallWebVRSpecShim();
       }
     </script>
 
@@ -71,8 +71,8 @@
     uniform mat4 translation; // dodecahedral
     uniform mat4 boost;
     // uniform vec3 cellColor;
-    uniform vec4 cellColorQuat; 
-    uniform vec4 userCellColorQuat; 
+    uniform vec4 cellColorQuat;
+    uniform vec4 userCellColorQuat;
 
     vec3 ChooseColor( in vec3 nBase )
     {
@@ -164,7 +164,7 @@
         float norm = sqrt(r*r+g*g+b*b);
         r /= norm;
         g /= norm;
-        b /= norm; 
+        b /= norm;
         return vec3(r*0.5 + 0.5,g*0.5 + 0.5,b*0.5 + 0.5);
     }
 
@@ -249,8 +249,8 @@
   </script>
 
 
-   <!-- 
-	Bundled App (Concatenated and Minified) 
+   <!--
+	Bundled App (Concatenated and Minified)
 	Libraries, dependencies and Main code
    -->
    <script src="./index.bundle.js" id="mainCode"></script>
