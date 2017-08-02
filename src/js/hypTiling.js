@@ -1,3 +1,5 @@
+//import { makeTsfmsList } from './lib/hypMath';
+
 var camera;
 var scene;
 var renderer;

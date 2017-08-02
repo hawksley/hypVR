@@ -45606,46 +45606,6 @@ window.digitsDepth = function digitsDepth(digits) {
 	return digits.length - numZeros;
 };
 
-window.makeTsfmsList = function makeTsfmsList(tilingGens, tilingDepth) {
-	var numTsfmsEachDepth = [];
-	var cumulativeNumTsfms = [];
-	for (var l = 0; l < tilingDepth + 1; l++) {
-		//initialise array to zeros
-		numTsfmsEachDepth[numTsfmsEachDepth.length] = 0;
-		cumulativeNumTsfms[cumulativeNumTsfms.length] = 0;
-	}
-	var numGens = tilingGens.length;
-	var tsfms = [];
-	var words = [];
-	for (var j = 0; j < Math.pow(numGens, tilingDepth); j++) {
-		var digits = [];
-		var jcopy = j;
-		for (var k = 0; k < tilingDepth; k++) {
-			digits[digits.length] = jcopy % numGens;
-			jcopy = jcopy / numGens | 0;
-		}
-		// console.log(digits);
-		var newTsfm = new THREE.Matrix4();
-		for (var l = 0; l < tilingDepth; l++) {
-			newTsfm = newTsfm.multiply(tilingGens[digits[l]]);
-		}
-
-		if (!isMatrixInArray(newTsfm, tsfms)) {
-			tsfms[tsfms.length] = newTsfm;
-			words[words.length] = digits;
-			numTsfmsEachDepth[digitsDepth(digits)] += 1;
-		}
-	}
-
-	for (var i = 0; i < tilingDepth; i++) {
-		cumulativeNumTsfms[i] = numTsfmsEachDepth[i];
-		if (i > 0) {
-			cumulativeNumTsfms[i] += cumulativeNumTsfms[i - 1];
-		}
-	}
-	return [tsfms, words, cumulativeNumTsfms];
-};
-
 window.translateByVector = function translateByVector(v) {
 	// trickery stolen from Jeff Weeks' Curved Spaces app
 	var dx = v.x;
@@ -45853,11 +45813,58 @@ window.word2colorQuat = function word2colorQuat(word) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return acosh; });
+/* unused harmony export makeTsfmsList */
 //  discuss at: http://phpjs.org/functions/acosh/
 //  original by: Onno Marsman
 //  example 1: acosh(8723321.4);
 //  returns 1: 16.674657798418625
 const acosh = arg => Math.log(arg + Math.sqrt(arg * arg - 1));
+
+const makeTsfmsList = (tilingGens, tilingDepth) => {
+	let numTsfmsEachDepth = [];
+	let cumulativeNumTsfms = [];
+
+	for (let l = 0; l < tilingDepth + 1; l++) {
+		//initialise array to zeros
+		numTsfmsEachDepth[numTsfmsEachDepth.length] = 0;
+		cumulativeNumTsfms[cumulativeNumTsfms.length] = 0;
+	}
+
+	let numGens = tilingGens.length;
+	let tsfms = [];
+	let words = [];
+	let genPower = 1;
+	for (let j = 0; j < genPower; j++) {
+		let digits = [];
+		let jcopy = j;
+		for (let k = 0; k < tilingDepth; k++) {
+			digits[digits.length] = jcopy % numGens;
+			jcopy = jcopy / numGens | 0;
+		}
+		// console.log(digits);
+		var newTsfm = new THREE.Matrix4();
+		for (let l = 0; l < tilingDepth; l++) {
+			newTsfm = newTsfm.multiply(tilingGens[digits[l]]);
+		}
+
+		if (!isMatrixInArray(newTsfm, tsfms)) {
+			tsfms[tsfms.length] = newTsfm;
+			words[words.length] = digits;
+			numTsfmsEachDepth[digitsDepth(digits)] += 1;
+		}
+		genPower = Math.pow(numGens, tilingDepth);
+	}
+
+	for (let i = 0; i < tilingDepth; i++) {
+		cumulativeNumTsfms[i] = numTsfmsEachDepth[i];
+		if (i > 0) {
+			cumulativeNumTsfms[i] += cumulativeNumTsfms[i - 1];
+		}
+	}
+	return [tsfms, words, cumulativeNumTsfms];
+};
+
+window.makeTsfmsList = makeTsfmsList;
 
 
 
@@ -45910,6 +45917,8 @@ const Matrix = THREE.Matrix4;
 /***/ }),
 /* 11 */
 /***/ (function(module, exports) {
+
+//import { makeTsfmsList } from './lib/hypMath';
 
 var camera;
 var scene;
