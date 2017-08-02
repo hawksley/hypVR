@@ -80,7 +80,7 @@ __webpack_require__(5);
 __webpack_require__(6);
 __webpack_require__(7);
 // Main Code
-__webpack_require__(9);
+__webpack_require__(10);
 
 /***/ }),
 /* 1 */
@@ -45822,34 +45822,16 @@ window.fixOutsideCentralCell = function fixOutsideCentralCell(mat, gens) {
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_hypMath__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__lib_matrix_rotations__ = __webpack_require__(9);
+
 
 
 // 	Schlafli symbol {4,3,6} is cubes with 6 around each edge
 
-var dist = 2 * Object(__WEBPACK_IMPORTED_MODULE_0__lib_hypMath__["a" /* acosh */])(Math.sqrt(1.5));
-
-//use translateByVector from VRControlsHyperbolic.js
-
-// var tilingGens =
-// [
-// new THREE.Matrix4(),  //id matrix
-// translateByVector(new THREE.Vector3(dist,0,0)),
-// translateByVector(new THREE.Vector3(-dist,0,0)),
-// translateByVector(new THREE.Vector3(0,dist,0)),
-// translateByVector(new THREE.Vector3(0,-dist,0)),
-// translateByVector(new THREE.Vector3(0,0,dist)),
-// translateByVector(new THREE.Vector3(0,0,-dist))
-// ];
-
-var rotx = new THREE.Matrix4().makeRotationX(Math.PI / 2);
-var rotxi = new THREE.Matrix4().makeRotationX(-Math.PI / 2);
-var roty = new THREE.Matrix4().makeRotationY(Math.PI / 2);
-var rotyi = new THREE.Matrix4().makeRotationY(-Math.PI / 2);
-var rotz = new THREE.Matrix4().makeRotationZ(Math.PI / 2);
-var rotzi = new THREE.Matrix4().makeRotationZ(-Math.PI / 2);
+const dist = 2 * Object(__WEBPACK_IMPORTED_MODULE_0__lib_hypMath__["a" /* acosh */])(Math.sqrt(1.5));
 
 window.tilingGens = [new THREE.Matrix4().identity(), //id matrix
-rotxi.multiply(translateByVector(new THREE.Vector3(dist, 0, 0))), rotx.multiply(translateByVector(new THREE.Vector3(-dist, 0, 0))), rotyi.multiply(translateByVector(new THREE.Vector3(0, dist, 0))), roty.multiply(translateByVector(new THREE.Vector3(0, -dist, 0))), rotzi.multiply(translateByVector(new THREE.Vector3(0, 0, dist))), rotz.multiply(translateByVector(new THREE.Vector3(0, 0, -dist)))]; ///these multiplies are consistent with left hand screw monkeys
+__WEBPACK_IMPORTED_MODULE_1__lib_matrix_rotations__["b" /* rotxi */].multiply(translateByVector(new THREE.Vector3(dist, 0, 0))), __WEBPACK_IMPORTED_MODULE_1__lib_matrix_rotations__["a" /* rotx */].multiply(translateByVector(new THREE.Vector3(-dist, 0, 0))), __WEBPACK_IMPORTED_MODULE_1__lib_matrix_rotations__["d" /* rotyi */].multiply(translateByVector(new THREE.Vector3(0, dist, 0))), __WEBPACK_IMPORTED_MODULE_1__lib_matrix_rotations__["c" /* roty */].multiply(translateByVector(new THREE.Vector3(0, -dist, 0))), __WEBPACK_IMPORTED_MODULE_1__lib_matrix_rotations__["f" /* rotzi */].multiply(translateByVector(new THREE.Vector3(0, 0, dist))), __WEBPACK_IMPORTED_MODULE_1__lib_matrix_rotations__["e" /* rotz */].multiply(translateByVector(new THREE.Vector3(0, 0, -dist)))]; ///these multiplies are consistent with left hand screw monkeys
 
 window.genQuatsColourSchemes = [[//// 8 colours untwisted
 new THREE.Quaternion(0, 0, 0, 1), new THREE.Quaternion(-1, 0, 0, 0), new THREE.Quaternion(1, 0, 0, 0), new THREE.Quaternion(0, -1, 0, 0), new THREE.Quaternion(0, 1, 0, 0), new THREE.Quaternion(0, 0, -1, 0), new THREE.Quaternion(0, 0, 1, 0)], [//// 8 colours twisted
@@ -45857,12 +45839,12 @@ new THREE.Quaternion(0, 0, 0, 1), new THREE.Quaternion(1, 0, 0, 0), new THREE.Qu
 new THREE.Quaternion(0, 0, 0, 1), new THREE.Quaternion(0, 0, 0, -1), new THREE.Quaternion(0, 0, 0, -1), new THREE.Quaternion(0, 0, 0, -1), new THREE.Quaternion(0, 0, 0, -1), new THREE.Quaternion(0, 0, 0, -1), new THREE.Quaternion(0, 0, 0, -1)]];
 
 window.word2colorQuat = function word2colorQuat(word) {
-    // word is a list of indexes into tilingGens
-    var quat = new THREE.Quaternion(0, 0, 0, 1);
-    for (var j = 0; j < word.length; j++) {
-        quat.multiply(genQuatsColourSchemes[colourMode][word[j]]);
-    }
-    return quat;
+  // word is a list of indexes into tilingGens
+  var quat = new THREE.Quaternion(0, 0, 0, 1);
+  for (var j = 0; j < word.length; j++) {
+    quat.multiply(genQuatsColourSchemes[colourMode][word[j]]);
+  }
+  return quat;
 };
 
 /***/ }),
@@ -45881,6 +45863,39 @@ const acosh = arg => Math.log(arg + Math.sqrt(arg * arg - 1));
 
 /***/ }),
 /* 9 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return rotx; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return rotxi; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return roty; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return rotyi; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return rotz; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return rotzi; });
+//use translateByVector from VRControlsHyperbolic.js
+
+// var tilingGens =
+// [
+// new THREE.Matrix4(),  //id matrix
+// translateByVector(new THREE.Vector3(dist,0,0)),
+// translateByVector(new THREE.Vector3(-dist,0,0)),
+// translateByVector(new THREE.Vector3(0,dist,0)),
+// translateByVector(new THREE.Vector3(0,-dist,0)),
+// translateByVector(new THREE.Vector3(0,0,dist)),
+// translateByVector(new THREE.Vector3(0,0,-dist))
+// ];
+
+const rotx = new THREE.Matrix4().makeRotationX(Math.PI / 2);
+const rotxi = new THREE.Matrix4().makeRotationX(-Math.PI / 2);
+const roty = new THREE.Matrix4().makeRotationY(Math.PI / 2);
+const rotyi = new THREE.Matrix4().makeRotationY(-Math.PI / 2);
+const rotz = new THREE.Matrix4().makeRotationZ(Math.PI / 2);
+const rotzi = new THREE.Matrix4().makeRotationZ(-Math.PI / 2);
+
+
+
+/***/ }),
+/* 10 */
 /***/ (function(module, exports) {
 
 var camera;
