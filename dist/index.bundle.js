@@ -80,7 +80,7 @@ __webpack_require__(5);
 __webpack_require__(6);
 __webpack_require__(7);
 // Main Code
-__webpack_require__(10);
+__webpack_require__(11);
 
 /***/ }),
 /* 1 */
@@ -45872,6 +45872,8 @@ const acosh = arg => Math.log(arg + Math.sqrt(arg * arg - 1));
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return rotyi; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return rotz; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return rotzi; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__matrix4__ = __webpack_require__(10);
+
 //use translateByVector from VRControlsHyperbolic.js
 
 // var tilingGens =
@@ -45885,17 +45887,28 @@ const acosh = arg => Math.log(arg + Math.sqrt(arg * arg - 1));
 // translateByVector(new THREE.Vector3(0,0,-dist))
 // ];
 
-const rotx = new THREE.Matrix4().makeRotationX(Math.PI / 2);
-const rotxi = new THREE.Matrix4().makeRotationX(-Math.PI / 2);
-const roty = new THREE.Matrix4().makeRotationY(Math.PI / 2);
-const rotyi = new THREE.Matrix4().makeRotationY(-Math.PI / 2);
-const rotz = new THREE.Matrix4().makeRotationZ(Math.PI / 2);
-const rotzi = new THREE.Matrix4().makeRotationZ(-Math.PI / 2);
+const RIGHT_ANGLE = Math.PI / 2;
+const rotx = new __WEBPACK_IMPORTED_MODULE_0__matrix4__["a" /* Matrix */]().makeRotationX(RIGHT_ANGLE);
+const rotxi = new __WEBPACK_IMPORTED_MODULE_0__matrix4__["a" /* Matrix */]().makeRotationX(-RIGHT_ANGLE);
+const roty = new __WEBPACK_IMPORTED_MODULE_0__matrix4__["a" /* Matrix */]().makeRotationY(RIGHT_ANGLE);
+const rotyi = new __WEBPACK_IMPORTED_MODULE_0__matrix4__["a" /* Matrix */]().makeRotationY(-RIGHT_ANGLE);
+const rotz = new __WEBPACK_IMPORTED_MODULE_0__matrix4__["a" /* Matrix */]().makeRotationZ(RIGHT_ANGLE);
+const rotzi = new __WEBPACK_IMPORTED_MODULE_0__matrix4__["a" /* Matrix */]().makeRotationZ(-RIGHT_ANGLE);
 
 
 
 /***/ }),
 /* 10 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Matrix; });
+const Matrix = THREE.Matrix4;
+
+
+
+/***/ }),
+/* 11 */
 /***/ (function(module, exports) {
 
 var camera;

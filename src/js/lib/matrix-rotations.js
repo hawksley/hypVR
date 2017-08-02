@@ -1,3 +1,4 @@
+import { Matrix } from './matrix4';
 //use translateByVector from VRControlsHyperbolic.js
 
 // var tilingGens =
@@ -11,12 +12,13 @@
 // translateByVector(new THREE.Vector3(0,0,-dist))
 // ];
 
-const rotx = new THREE.Matrix4().makeRotationX( Math.PI/2 );
-const rotxi = new THREE.Matrix4().makeRotationX( -Math.PI/2 );
-const roty = new THREE.Matrix4().makeRotationY( Math.PI/2 );
-const rotyi = new THREE.Matrix4().makeRotationY( -Math.PI/2 );
-const rotz = new THREE.Matrix4().makeRotationZ( Math.PI/2 );
-const rotzi = new THREE.Matrix4().makeRotationZ( -Math.PI/2 );
+const RIGHT_ANGLE = Math.PI/2;
+const rotx = new Matrix().makeRotationX( RIGHT_ANGLE );
+const rotxi = new Matrix().makeRotationX( -RIGHT_ANGLE );
+const roty = new Matrix().makeRotationY( RIGHT_ANGLE );
+const rotyi = new Matrix().makeRotationY( -RIGHT_ANGLE );
+const rotz = new Matrix().makeRotationZ( RIGHT_ANGLE );
+const rotzi = new Matrix().makeRotationZ( -RIGHT_ANGLE );
 
 export {
   rotx,
