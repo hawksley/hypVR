@@ -1,13 +1,6 @@
+import { acosh } from './lib/hypMath';
+
 ﻿// 	Schlafli symbol {4,3,6} is cubes with 6 around each edge
-
-function acosh(arg) {
-  //  discuss at: http://phpjs.org/functions/acosh/
-  // original by: Onno Marsman
-  //   example 1: acosh(8723321.4);
-  //   returns 1: 16.674657798418625
-
-  return Math.log(arg + Math.sqrt(arg * arg - 1));
-}
 
 var dist = 2*acosh( Math.sqrt(1.5) )
 

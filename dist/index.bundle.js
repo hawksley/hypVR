@@ -80,7 +80,7 @@ __webpack_require__(5);
 __webpack_require__(6);
 __webpack_require__(7);
 // Main Code
-__webpack_require__(8);
+__webpack_require__(9);
 
 /***/ }),
 /* 1 */
@@ -45817,20 +45817,16 @@ window.fixOutsideCentralCell = function fixOutsideCentralCell(mat, gens) {
 
 /***/ }),
 /* 7 */
-/***/ (function(module, exports) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_hypMath__ = __webpack_require__(8);
+
 
 // 	Schlafli symbol {4,3,6} is cubes with 6 around each edge
 
-function acosh(arg) {
-  //  discuss at: http://phpjs.org/functions/acosh/
-  // original by: Onno Marsman
-  //   example 1: acosh(8723321.4);
-  //   returns 1: 16.674657798418625
-
-  return Math.log(arg + Math.sqrt(arg * arg - 1));
-}
-
-var dist = 2 * acosh(Math.sqrt(1.5));
+var dist = 2 * Object(__WEBPACK_IMPORTED_MODULE_0__lib_hypMath__["a" /* acosh */])(Math.sqrt(1.5));
 
 //use translateByVector from VRControlsHyperbolic.js
 
@@ -45861,16 +45857,30 @@ new THREE.Quaternion(0, 0, 0, 1), new THREE.Quaternion(1, 0, 0, 0), new THREE.Qu
 new THREE.Quaternion(0, 0, 0, 1), new THREE.Quaternion(0, 0, 0, -1), new THREE.Quaternion(0, 0, 0, -1), new THREE.Quaternion(0, 0, 0, -1), new THREE.Quaternion(0, 0, 0, -1), new THREE.Quaternion(0, 0, 0, -1), new THREE.Quaternion(0, 0, 0, -1)]];
 
 window.word2colorQuat = function word2colorQuat(word) {
-  // word is a list of indexes into tilingGens
-  var quat = new THREE.Quaternion(0, 0, 0, 1);
-  for (var j = 0; j < word.length; j++) {
-    quat.multiply(genQuatsColourSchemes[colourMode][word[j]]);
-  }
-  return quat;
+    // word is a list of indexes into tilingGens
+    var quat = new THREE.Quaternion(0, 0, 0, 1);
+    for (var j = 0; j < word.length; j++) {
+        quat.multiply(genQuatsColourSchemes[colourMode][word[j]]);
+    }
+    return quat;
 };
 
 /***/ }),
 /* 8 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return acosh; });
+//  discuss at: http://phpjs.org/functions/acosh/
+//  original by: Onno Marsman
+//  example 1: acosh(8723321.4);
+//  returns 1: 16.674657798418625
+const acosh = arg => Math.log(arg + Math.sqrt(arg * arg - 1));
+
+
+
+/***/ }),
+/* 9 */
 /***/ (function(module, exports) {
 
 var camera;
