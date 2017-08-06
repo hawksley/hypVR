@@ -1,3 +1,9 @@
+import { Matrix } from '../three-utils';
+import {
+  isMatrixInArray,
+  digitsDepth
+} from '../hypMath';
+
 //  discuss at: http://phpjs.org/functions/acosh/
 //  original by: Onno Marsman
 //  example 1: acosh(8723321.4);
@@ -25,7 +31,7 @@ const makeTsfmsList = ( tilingGens, tilingDepth ) => {
 	      jcopy = (jcopy/numGens)|0;
 	    }
 	    // console.log(digits);
-	    var newTsfm = new THREE.Matrix4();
+	    var newTsfm = new Matrix();
 	    for (let l = 0; l < tilingDepth; l++) {
 	      newTsfm = newTsfm.multiply(tilingGens[digits[l]]);
 	    }

@@ -1,98 +1,74 @@
 //import { makeTsfmsList } from './lib/hypMath';
+import * as decorationArray from './decoration-array';
+import getMaterialBase from './get-material-base';
+import updateBigMatArray from './update-big-mat-array';
+import getCamera from './get-camera';
+import {
+  CONTROLS,
+  LOADING_MANAGER,
+  MESH,
+  MATRIX4,
+  OBJLOADER,
+  QUATERNION,
+  SCENE,
+  RENDERER,
+  VREFFECT
+} from './three-utils';
 
-var camera;
-var scene;
-var renderer;
-var mesh;
+import {
+  loadElement
+} from './load-element';
 
-var infoSprite = new THREE.Mesh();
-var effect;
-var controls;
+let camera;
+let scene;
+let renderer;
+let mesh;
+
+let infoSprite = MESH;
+let effect;
+let controls;
 // var music = document.querySelector('#music');
-var clicky = 0;
-var mouseX = 1;
-var mouseY = 1;
-window.currentBoost = new THREE.Matrix4().set(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
+let clicky = 0;
+let mouseX = 1;
+let mouseY = 1;
+window.currentBoost = MATRIX4.set(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
 
-var decorationArray = [
-  'cube',
-  'cubeThickEdges',
-  'truncatedCube',
-  'truncatedCubeTrisOnly',
-  'truncatedCubeBdry',
-  'cubeDual',
-  'monkey',
-  'monkey2',
-  'monkey3'
-  //'rhombicDodec'
-  ];
-
-var decoration = "truncatedCube";
+let decoration = "truncatedCube";
 window.colourMode = 0;
 
-var doubleSided = false;
+let doubleSided = false;
 
-var numObjects = 1; //number of obj files to load
-var numGens = tilingGens.length;
-var tilingDepth = 4; //default 4
+let numObjects = 1; //number of obj files to load
+let numGens = tilingGens.length;
+let tilingDepth = 4; //default 4
 
-var unpackTriple = makeTsfmsList( tilingGens, tilingDepth );
-var tsfms = unpackTriple[0];
-var words = unpackTriple[1];
-var cumulativeNumTsfms = unpackTriple[2];
+let unpackTriple = makeTsfmsList( tilingGens, tilingDepth );
+let tsfms = unpackTriple[0];
+let words = unpackTriple[1];
+let cumulativeNumTsfms = unpackTriple[2];
 
 var numTiles = tsfms.length;
 var bigMatArray;
 
-var movedTowardsCentralCubeThisFrameIndex = false;
+let movedTowardsCentralCubeThisFrameIndex = false;
+var materialBase;
 
 function init() {
   var start = Date.now();
-  scene = new THREE.Scene();
-  camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 100);
+  scene = SCENE;
+  camera = getCamera(window);
   camera.position.x = 0;
   camera.position.z = 0;
 
-  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer = RENDERER({ antialias: true });
   document.body.appendChild(renderer.domElement);
 
-  controls = new THREE.VRControls(camera);
+  controls = CONTROLS(camera);
 
-  effect = new THREE.VREffect(renderer);
+  effect = VREFFECT(renderer);
   effect.setSize(window.innerWidth, window.innerHeight);
 
-  materialBase = new THREE.ShaderMaterial({
-    uniforms: { // these are the parameters for the shader
-      time: { // global time
-        type: "f",
-        value: 0.0
-      },
-      translation: { // quaternion that moves shifts the object, set once per object
-        type: "m4",
-        value: new THREE.Matrix4().set(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
-      },
-      boost: {
-        type: "m4",
-        value: new THREE.Matrix4().set(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
-      },
-      cellColorQuat: {
-        type: "v4",
-        value: new THREE.Quaternion( 0,0,0,1 )
-      },
-      userCellColorQuat: {  // which index colour the user is in
-        type: "v4",
-        value: new THREE.Quaternion( 0,0,0,1 )
-      }
-    },
-    vertexShader: document.getElementById('vertexShader').textContent,
-    fragmentShader: document.getElementById('fragmentShader').textContent
-  });
-
-  if (doubleSided) {
-    materialBase.side = THREE.DoubleSide;
-  }
-
-
+  materialBase = getMaterialBase(doubleSided);
 
   loadStuff();
 
@@ -110,90 +86,92 @@ function init() {
   effect.render(scene, camera, animate);
 }
 
-function updateBigMatArray(){
-  bigMatArray = new Array(numObjects * numTiles);
-  // one material per object, since they have a different positions
-  for (var i = 0; i < bigMatArray.length; i++) {
-    bigMatArray[i] = materialBase.clone();
-  }
-}
-
 function loadStuff(){
-  var manager = new THREE.LoadingManager();
-  var loader = new THREE.OBJLoader(manager);
+  var cubeDecoration;
+  var manager = LOADING_MANAGER;
+  var loader = OBJLOADER(manager);
 
-  if (decoration == "monkey" || decoration == "monkey2" || decoration == "monkey3"){
+  const isDecorationAMonkey = ([
+    "monkey",
+    "monkey2",
+    "monkey3"
+  ].indexOf(decoration) > -1);
+
+  if (isDecorationAMonkey) {
     numObjects = 2;
-    updateBigMatArray();
+    bigMatArray = updateBigMatArray(bigMatArray, numObjects, numTiles, materialBase);
 
-    if (decoration == "monkey"){
-      var cubeDecoration = 'cube';
+    switch( decoration) {
+      case "monkey":
+        cubeDecoration = 'cube';
+        break;
+      case "monkey2":
+        cubeDecoration = 'truncatedCube';
+        break;
+      default:
+        cubeDecoration = 'truncatedCubeTrisOnly';
     }
-    else if (decoration == "monkey2"){
-      var cubeDecoration = 'truncatedCube';
-    }
-    else {
-      var cubeDecoration = 'truncatedCubeTrisOnly';
-    }
-    /// first, coloured cube
-    loader.load('media/'.concat(cubeDecoration, '.obj'), function (object) {
-      for (var i = 0; i < numTiles; i++) {
-        var newObject = object.clone();
-        newObject.children[0].material = bigMatArray[(i)];
-        // newObject.children[0].frustumCulled = false;
-        scene.add(newObject);
-      }
+
+    loadElement({
+      loader,
+      path: 'media/'.concat(cubeDecoration, '.obj'),
+      scene,
+      maxIterations: numTiles,
+      bigMatArray,
+      extra: 0
     });
 
-    /// then, non coloured monkeys
-    loader.load('media/euc_monkey_cut_7p5k.obj', function (object) {
-      for (var i = 0; i < cumulativeNumTsfms[1]; i++) {
-        var newObject = object.clone();
-        newObject.children[0].material = bigMatArray[i + numTiles];
-        // newObject.children[0].frustumCulled = false;
-        scene.add(newObject);
-      }
+    loadElement({
+      loader,
+      path: 'media/euc_monkey_cut_7p5k.obj',
+      scene,
+      maxIterations: cumulativeNumTsfms[1],
+      bigMatArray,
+      extra: numTiles
     });
 
-      loader.load('media/euc_monkey_cut_3k.obj', function (object) {
-      for (var i = cumulativeNumTsfms[1]; i < cumulativeNumTsfms[2]; i++) {
-        var newObject = object.clone();
-        newObject.children[0].material = bigMatArray[i + numTiles];
-        // newObject.children[0].frustumCulled = false;
-        scene.add(newObject);
-      }
+    loadElement({
+      loader,
+      path: 'media/euc_monkey_cut_3k.obj',
+      scene,
+      minIterations: cumulativeNumTsfms[1],
+      maxIterations: cumulativeNumTsfms[2],
+      bigMatArray,
+      extra: numTiles
     });
 
-      loader.load('media/euc_monkey_cut_1p5k.obj', function (object) {
-      for (var i = cumulativeNumTsfms[2]; i < cumulativeNumTsfms[3]; i++) {
-        var newObject = object.clone();
-        newObject.children[0].material = bigMatArray[i + numTiles];
-        // newObject.children[0].frustumCulled = false;
-        scene.add(newObject);
-      }
+    loadElement({
+      loader,
+      path: 'media/euc_monkey_cut_1p5k.obj',
+      scene,
+      minIterations: cumulativeNumTsfms[2],
+      maxIterations: cumulativeNumTsfms[3],
+      bigMatArray,
+      extra: numTiles
     });
 
-      loader.load('media/euc_monkey_cut_750.obj', function (object) {
-      for (var i = cumulativeNumTsfms[3]; i < numTiles; i++) {
-        var newObject = object.clone();
-        newObject.children[0].material = bigMatArray[i + numTiles];
-        // newObject.children[0].frustumCulled = false;
-        scene.add(newObject);
-      }
+    loadElement({
+      loader,
+      path: 'media/euc_monkey_cut_750.obj',
+      scene,
+      minIterations: cumulativeNumTsfms[3],
+      maxIterations: cumulativeNumTsfms[4],
+      bigMatArray,
+      extra: numTiles
     });
   }
 
   else {
       numObjects = 1;
-      updateBigMatArray();
-      loader.load('media/'.concat(decoration, '.obj'), function (object) {
-      for (var i = 0; i < numTiles; i++) {
-        var newObject = object.clone();
-        newObject.children[0].material = bigMatArray[(i)];
-        // newObject.children[0].frustumCulled = false;
-        scene.add(newObject);
-      }
-    });
+      bigMatArray = updateBigMatArray(bigMatArray, numObjects, numTiles, materialBase);
+      loadElement({
+        loader,
+        path: 'media/'.concat(decoration, '.obj'),
+        scene,
+        maxIterations: numTiles,
+        bigMatArray,
+        extra: 0
+      });
   }
   for (var k = 0; k < numObjects; k++) {
     for (var j = 0; j < numTiles; j++) {
@@ -228,7 +206,7 @@ function animate() {
       // console.log(bigMatArray[i].uniforms['userCellColorQuat'].value);
       if (movedTowardsCentralCubeThisFrameIndex != false) {
 
-        var tempQuat = new THREE.Quaternion();
+        var tempQuat = QUATERNION;
         tempQuat.copy(bigMatArray[i].uniforms['userCellColorQuat'].value);
         tempQuat.multiply(genQuatsColourSchemes[colourMode][movedTowardsCentralCubeThisFrameIndex]);
 

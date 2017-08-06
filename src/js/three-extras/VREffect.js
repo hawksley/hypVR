@@ -1,3 +1,5 @@
+import 'three';
+
 /**
  * @author dmarcos / https://github.com/dmarcos
  * @author hawksley / https://github.com/hawksley (added phone VR support, and fixed full screen for all devices)

@@ -1,4 +1,6 @@
-"use strict";
+import {
+  Quaternion
+} from './three-utils';
 
 // It seems to be impossible to synchronously detect whether we have an orientation sensor.
 // Even Chromium on the desktop has a 'deviceorientation' event, and it will fire once with
@@ -42,13 +44,13 @@ class PhoneVR {
       var y = cX * sY * cZ + sX * cY * sZ;
       var z = cX * cY * sZ + sX * sY * cZ;
 
-      var deviceQuaternion = new THREE.Quaternion(x, y, z, w);
+      var deviceQuaternion = new Quaternion(x, y, z, w);
 
       // Correct for the screen orientation.
       var screenOrientation = (this.getScreenOrientation() * degtorad)/2;
-      var screenTransform = new THREE.Quaternion(0, 0, -Math.sin(screenOrientation), Math.cos(screenOrientation));
+      var screenTransform = new Quaternion(0, 0, -Math.sin(screenOrientation), Math.cos(screenOrientation));
 
-      var deviceRotation = new THREE.Quaternion();
+      var deviceRotation = new Quaternion();
       deviceRotation.multiplyQuaternions(deviceQuaternion, screenTransform);
 
       // deviceRotation is the quaternion encoding of the transformation
@@ -59,7 +61,7 @@ class PhoneVR {
       // To fix the mismatch, we need to fix this.  We'll arbitrarily choose
       // North to correspond to -z (the default camera direction).
       var r22 = Math.sqrt(0.5);
-      deviceRotation.multiplyQuaternions(new THREE.Quaternion(-r22, 0, 0, r22), deviceRotation);
+      deviceRotation.multiplyQuaternions(new Quaternion(-r22, 0, 0, r22), deviceRotation);
 
       return deviceRotation;
   }

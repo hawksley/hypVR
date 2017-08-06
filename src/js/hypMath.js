@@ -1,41 +1,35 @@
 //hyperbolic matrix functions
+import 'three';
 
 THREE.Matrix4.prototype.add = function (m) {
   this.set.apply(this, [].map.call(this.elements, function (c, i) { return c + m.elements[i] }));
 };
 
-// function areSameMatrix(mat1, mat2) {
-// 	var delta = 0.0001;
-// 	for (var coord=0; coord<16; coord++) {
-// 		if (Math.abs(mat1.elements[coord] - mat2.elements[coord]) > delta) {
-// 			return false;
-// 		}
-// 	}
-// 	return true;
-// }
+Array.prototype.subarray = function(start,end){
+     if(!end){ end=-1;}
+    return this.slice(start, this.length+1-(end*-1));
+};
 
-window.areSameMatrix = function areSameMatrix(mat1, mat2) {  //look only at last column - center of cell
+const areSameMatrix = (mat1, mat2) => {  //look only at last column - center of cell
 	var delta = 0.01;
 	for (var coord=3; coord<16; coord+=4) {
 		if (Math.abs(mat1.elements[coord] - mat2.elements[coord]) > delta) {
 			return false;
 		}
 	}
-	// console.log('same matrix')
-	// console.log(mat1.elements)
-	// console.log(mat2.elements)
-	return true;
-}
 
-window.isMatrixInArray = function isMatrixInArray(mat, matArray) {
+	return true;
+};
+
+const isMatrixInArray = (mat, matArray) => {
 	for (var i=0; i<matArray.length; i++) {
 		if (areSameMatrix(mat, matArray[i])) {
-		// if (i > 3) {
 			return true;
 		}
 	}
+
 	return false;
-}
+};
 
 // function hypDistFromOrigin(v) {
 // // put the point onto Klein model
@@ -43,7 +37,7 @@ window.isMatrixInArray = function isMatrixInArray(mat, matArray) {
 // 	return Math.atanh(Math.sqrt((v.x*v.x + v.y*v.y + v.z*v.z) / (v.w*v.w)));
 // }  //dont need this for calculating nearest point to origin - atanh is increasing function
 
-window.digitsDepth = function digitsDepth( digits ) {
+const digitsDepth = ( digits ) => {
 	var numZeros = 0;
 	for (var i = 0; i < digits.length; i++) {
 		if ( digits[i] == 0 ) {
@@ -53,7 +47,8 @@ window.digitsDepth = function digitsDepth( digits ) {
 	return digits.length - numZeros;
 }
 
-window.translateByVector = function translateByVector(v) { // trickery stolen from Jeff Weeks' Curved Spaces app
+ const translateByVector = (v) => {
+   // trickery stolen from Jeff Weeks' Curved Spaces app
   var dx = v.x;
   var dy = v.y;
   var dz = v.z;
@@ -75,9 +70,9 @@ window.translateByVector = function translateByVector(v) { // trickery stolen fr
   result.add(m);
   result.add(m2);
   return result;
-}
+};
 
-window.parabolicBy2DVector = function parabolicBy2DVector(v) {  ///  something is wrong here we think...
+const parabolicBy2DVector = (v) => {  ///  something is wrong here we think...
   var dx = v.x; /// first make parabolic fixing point at infinity in pos z direction
   var dy = v.y;
   var m = new THREE.Matrix4().set(
@@ -96,22 +91,15 @@ window.parabolicBy2DVector = function parabolicBy2DVector(v) {  ///  something i
   var cameraMinv = new THREE.Matrix4().getInverse(cameraM);
 
   return cameraM.multiply(result).multiply(cameraMinv);
-}
+};
 
-window.getFwdVector = function getFwdVector() {
-  return new THREE.Vector3(0,0,1).applyQuaternion(camera.quaternion);
-}
-window.getRightVector = function getRightVector() {
-  return new THREE.Vector3(-1,0,0).applyQuaternion(camera.quaternion);
-}
-window.getUpVector = function getUpVector() {
-  return new THREE.Vector3(0,-1,0).applyQuaternion(camera.quaternion);
-}
+const getFwdVector = () => ( new THREE.Vector3(0,0,1).applyQuaternion(camera.quaternion) );
+const getRightVector = () => ( new THREE.Vector3(-1,0,0).applyQuaternion(camera.quaternion) );
+const getUpVector = () => ( new THREE.Vector3(0,-1,0).applyQuaternion(camera.quaternion) );
 
 // fastGramSchmidt from Jeff Week's CurvedSpaces. Causes some wobble when far from the origin...
 
-window.fastGramSchmidt = function fastGramSchmidt( m )
-{
+const fastGramSchmidt = ( m ) => {
 	//	Numerical errors can accumulate and force aMatrix "out of round",
 	//	in the sense that its rows are no longer orthonormal.
 	//	This effect is small in spherical and flat spaces,
@@ -173,23 +161,18 @@ window.fastGramSchmidt = function fastGramSchmidt( m )
 		}
 	}
 	return m;
-}
+};
 
-///// better GramSchmidt...seem more stable out near infinity
-
-window.lorentzDot = function lorentzDot( u, v ){
+const lorentzDot = ( u, v ) => {
 	return u[0]*v[0] + u[1]*v[1] + u[2]*v[2] - u[3]*v[3];
-}
+};
 
-window.norm = function norm( v ){
+const norm = ( v ) => {
 	return Math.sqrt(Math.abs(lorentzDot(v,v)));
-}
-Array.prototype.subarray=function(start,end){
-     if(!end){ end=-1;}
-    return this.slice(start, this.length+1-(end*-1));
-}
+};
 
-window.gramSchmidt = function gramSchmidt( m ){
+
+const gramSchmidt = ( m ) => {
 	// var m = mat.elements;
 	for (var i = 0; i<4; i++) {  ///normalise row
 		var invRowNorm = 1.0 / norm( m.subarray(4*i, 4*i+4) );
@@ -204,22 +187,20 @@ window.gramSchmidt = function gramSchmidt( m ){
 		}
 	}
 	return m;
-}
-
+};
 
 ////////check if we are still inside the central fund dom...
-
-window.fakeDist = function fakeDist( v ){  //good enough for comparison of distances on the hyperboloid
+const fakeDist = ( v ) => {  //good enough for comparison of distances on the hyperboloid
 	return v.x*v.x + v.y*v.y + v.z*v.z;
-}
+};
 
-window.fixOutsideCentralCell = function fixOutsideCentralCell( mat, gens ) {
+const fixOutsideCentralCell = ( mat, gens ) => {
 	//assume first in Gens is identity, should probably fix when we get a proper list of matrices
 	var cPos = new THREE.Vector4(0,0,0,1).applyMatrix4( mat ); //central
 	var bestDist = fakeDist(cPos);
 	var bestIndex = 0;
 	for (var i=1; i < gens.length; i++){
-		pos = new THREE.Vector4(0,0,0,1).applyMatrix4( gens[i] ).applyMatrix4( mat );
+		const pos = new THREE.Vector4(0,0,0,1).applyMatrix4( gens[i] ).applyMatrix4( mat );
 		if (fakeDist(pos) < bestDist) {
 			bestDist = fakeDist(pos);
 			bestIndex = i;
@@ -232,4 +213,21 @@ window.fixOutsideCentralCell = function fixOutsideCentralCell( mat, gens ) {
     else {
         return false;
     }
+};
+
+export {
+  areSameMatrix,
+  isMatrixInArray,
+  digitsDepth,
+  translateByVector,
+  parabolicBy2DVector,
+  getFwdVector,
+  getRightVector,
+  getUpVector,
+  fixOutsideCentralCell,
+  fakeDist,
+  gramSchmidt,
+  fastGramSchmidt,
+  norm,
+  lorentzDot
 }
