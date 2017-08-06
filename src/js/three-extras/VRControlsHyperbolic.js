@@ -1,6 +1,11 @@
+import 'three';
+import {
+  fixOutsideCentralCell,
+	gramSchmidt
+} from '../hypMath';
 /**
  * @author dmarcos / https://github.com/dmarcos
- with additions by https://github.com/hawksley and https://github.com/henryseg
+ with additions by https://github.com/hawksley and https://github.com/henryseg and https://github.com/AbdoulSy
  */
 
 THREE.VRControls = function ( camera, done ) {
@@ -79,6 +84,7 @@ THREE.VRControls = function ( camera, done ) {
 	this.update = function() {
 
 		var camera = this._camera;
+		let movedTowardsCentralCubeThisFrameIndex = false;
 		var vrState = this.getVRState();
 		var manualRotation = this.manualRotation;
 		var oldTime = this.updateTime;
@@ -94,7 +100,7 @@ THREE.VRControls = function ( camera, done ) {
 			offset = new THREE.Vector3();
 			offset.x = vrState.hmd.lastPosition[0] - vrState.hmd.position[0];
 			offset.y = vrState.hmd.lastPosition[1] - vrState.hmd.position[1];
-			offset.z = vrState.hmd.lastPosition[2] - vrState.hmd.position[2]; 
+			offset.z = vrState.hmd.lastPosition[2] - vrState.hmd.position[2];
 		} else if (this.manualMoveRate[0] != 0 || this.manualMoveRate[1] != 0 || this.manualMoveRate[2] != 0) {
 		    offset = getFwdVector().multiplyScalar(0.2 * interval * this.manualMoveRate[0]).add(
 		      		   getRightVector().multiplyScalar(0.2 * interval * this.manualMoveRate[1])).add(
@@ -247,7 +253,7 @@ function onkey(event) {
   	fixOutside = !fixOutside;
   }	else if (event.keyCode == 82) { // r
   	fixOutsideCentralCell( currentBoost, tilingGens );
-  }	 
+  }
 }
 
 window.addEventListener("keydown", onkey, true);
