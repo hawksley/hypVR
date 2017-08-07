@@ -31,7 +31,9 @@
     "babel-preset-es2017": "^6.24.1",
     "eslint": "^4.3.0",
     "three": "^0.86.0",
+    "webgl-utils": "^1.0.1",
     "webpack": "^3.4.1",
-    "webpack-dev-server": "^2.6.1"
+    "webpack-dev-server": "^2.6.1",
+    "webvr-polyfill": "^0.9.36"
   }
 }

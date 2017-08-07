@@ -45,23 +45,10 @@
       var WebVRConfig = {
         // Prevents the polyfill from initializing automatically.
         DEFER_INITIALIZATION: true,
-	      FORCE_ENABLE_VR: true,
-        // Ensures the polyfill is always active when initialized, even if the
-        // native API is available. This is probably NOT what most pages want.
-        ALWAYS_APPEND_POLYFILL_DISPLAY: true,
+	      FORCE_ENABLE_VR: true
       }
     </script>
-    <script src="js/third-party/webvr-polyfill.js"></script>
     <script src="js/third-party/wglu/wglu-url.js"></script>
-    <script>
-      // Dynamically turn the polyfill on if requested by the query args.
-      if (WGLUUrl.getBool('polyfill', false)) {
-        InitializeWebVRPolyfill();
-      } else {
-        // Shim for migration from older version of WebVR. Shouldn't be necessary for very long.
-        InstallWebVRSpecShim();
-      }
-    </script>
 
     <script type="x-shader/x-vertex" id="vertexShader">
     // This shader moves vertices around
