@@ -128,11 +128,11 @@ THREE.VRControls = function ( camera, done ) {
 		currentBoost.elements = gramSchmidt( currentBoost.elements ); //seems more stable near infinity
 
 
-	  var update = new THREE.Quaternion(this.manualRotateRate[0] * 0.2 * interval,
+		var update = new THREE.Quaternion(this.manualRotateRate[0] * 0.2 * interval,
 	                               this.manualRotateRate[1] * 0.2 * interval,
 	                               this.manualRotateRate[2] * 0.2 * interval, 1.0);
-	  update.normalize();
-	  manualRotation.multiplyQuaternions(manualRotation, update);
+		update.normalize();
+		manualRotation.multiplyQuaternions(manualRotation, update);
 
 		if ( camera ) {
 			if ( !vrState ) {
@@ -225,9 +225,20 @@ var fixOutside = true; //moves you back inside the central cell if you leave it
 /*
 Listen for double click event to enter full-screen VR mode
 */
-document.body.addEventListener( 'dblclick', function() {
+document.body.addEventListener( 'click', function() {
+  effect.setFullScreen( true );	if (event.target.id === "vr-icon") {
+		event.target.style.display = "none";
+		effect.phoneVR.setVRMode(!effect.phoneVR.isVRMode);
+	}
+
   effect.setFullScreen( true );
-});
+
+
+  if (effect.phoneVR.orientationIsAvailable() && typeof window.screen.orientation !== 'undefined' && typeof window.screen.orientation.lock === 'function') {
+    window.screen.orientation.lock('landscape-primary');
+  }});
+
+var vrMode = false;
 
 /*
 Listen for keyboard events
@@ -240,7 +251,8 @@ function onkey(event) {
   } else if (event.keyCode == 70 || event.keyCode == 13) { //f
     effect.setFullScreen(true); //fullscreen
   } else if (event.keyCode == 86 || event.keyCode == 13 || event.keyCode == 32 ) { // v or 'enter' or 'space' for VR mode
-    effect.toggleVRMode();
+    vrMode = !vrMode;
+    effect.setVRMode(vrMode);
   } else if (event.keyCode == 84) { // t
   	fixOutside = !fixOutside;
   }	else if (event.keyCode == 82) { // r
@@ -261,11 +273,9 @@ function key(event, sign) {
   control.active = (sign === 1);
   if (control.index <= 2){
     controls.manualRotateRate[control.index] += sign * control.sign;
-  }
-  else if (control.index <= 5) {
+  } else if (control.index <= 5) {
     controls.manualMoveRate[control.index - 3] += sign * control.sign;
-  }
-  else {
+  } else {
     controls.manualParabolicRate[control.index - 6] += sign * control.sign;
   }
 }
