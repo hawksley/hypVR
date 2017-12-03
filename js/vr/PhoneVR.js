@@ -8,17 +8,12 @@ function PhoneVR() {
     this.deviceAlpha = null;
     this.deviceGamma = null;
     this.deviceBeta = null;
-    this.isVRMode = false;
 
     window.addEventListener('deviceorientation', function(orientation) {
         this.deviceAlpha = orientation.alpha;
         this.deviceGamma = orientation.gamma;
         this.deviceBeta = orientation.beta;
     }.bind(this));
-}
-
-PhoneVR.prototype.setVRMode = function(vrMode) {
-    return this.isVRMode = vrMode;
 }
 
 PhoneVR.prototype.orientationIsAvailable = function() {
