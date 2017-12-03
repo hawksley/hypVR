@@ -128,11 +128,11 @@ THREE.VRControls = function ( camera, done ) {
 		currentBoost.elements = gramSchmidt( currentBoost.elements ); //seems more stable near infinity
 
 
-	  var update = new THREE.Quaternion(this.manualRotateRate[0] * 0.2 * interval,
+		var update = new THREE.Quaternion(this.manualRotateRate[0] * 0.2 * interval,
 	                               this.manualRotateRate[1] * 0.2 * interval,
 	                               this.manualRotateRate[2] * 0.2 * interval, 1.0);
-	  update.normalize();
-	  manualRotation.multiplyQuaternions(manualRotation, update);
+		update.normalize();
+		manualRotation.multiplyQuaternions(manualRotation, update);
 
 		if ( camera ) {
 			if ( !vrState ) {
@@ -181,10 +181,8 @@ THREE.VRControls = function ( camera, done ) {
 				position = vrInput.getState().position;
 				position = [position.x, position.y, position.z];
 			} else {
-				var frameData = new VRFrameData();
-				vrInput.getFrameData(frameData);
-				position = frameData.pose.position;
-				orientation = frameData.pose.orientation;
+				orientation = vrInput.getPose().orientation;
+                position = vrInput.getPose().position;
 			}
 		} else if (this.phoneVR.rotationQuat()) {
 			var rotation = this.phoneVR.rotationQuat();
@@ -227,8 +225,18 @@ var fixOutside = true; //moves you back inside the central cell if you leave it
 /*
 Listen for double click event to enter full-screen VR mode
 */
-document.body.addEventListener( 'dblclick', function() {
-  effect.setFullScreen( true );
+document.body.addEventListener( 'click', function(event) {
+	if (event.target.id === "vr-icon") {
+		event.target.style.display = "none";
+		effect.phoneVR.setVRMode(!effect.phoneVR.isVRMode);
+	}
+
+ 	if (effect.phoneVR.orientationIsAvailable()) {
+  		effect.setFullScreen( true );
+		if (typeof window.screen.orientation !== 'undefined' && typeof window.screen.orientation.lock === 'function') {
+		  window.screen.orientation.lock('landscape-primary');
+		}
+	}
 });
 
 /*
@@ -263,11 +271,9 @@ function key(event, sign) {
   control.active = (sign === 1);
   if (control.index <= 2){
     controls.manualRotateRate[control.index] += sign * control.sign;
-  }
-  else if (control.index <= 5) {
+  } else if (control.index <= 5) {
     controls.manualMoveRate[control.index - 3] += sign * control.sign;
-  }
-  else {
+  } else {
     controls.manualParabolicRate[control.index - 6] += sign * control.sign;
   }
 }
