@@ -245,7 +245,6 @@ function animate() {
   }
   
   effect.render(scene, camera, animate);
-  // requestAnimationFrame(animate);
 }
 
 document.addEventListener('keydown', function(event) { selectShape(event); }, false);

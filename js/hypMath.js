@@ -97,23 +97,30 @@ function translateByVector(v) { // trickery stolen from Jeff Weeks' Curved Space
   var dy = v.y;
   var dz = v.z;
   var len = Math.sqrt(dx*dx + dy*dy + dz*dz);
-  dx /= len;
-  dy /= len;
-  dz /= len;
-  var m = new THREE.Matrix4().set(
-    0, 0, 0, dx,
-    0, 0, 0, dy,
-    0, 0, 0, dz,
-    dx,dy,dz, 0);
-  var m2 = new THREE.Matrix4().copy(m).multiply(m);
-  var c1 = Math.sinh(len);
-  var c2 = Math.cosh(len) - 1;
-  m.multiplyScalar(c1);
-  m2.multiplyScalar(c2);
-  var result = new THREE.Matrix4().identity();
-  result.add(m);
-  result.add(m2);
-  return result;
+  if (len == 0)
+  {
+    return new THREE.Matrix4().identity();
+  }
+  else  
+    {
+      dx /= len;
+      dy /= len;
+      dz /= len;
+      var m = new THREE.Matrix4().set(
+        0, 0, 0, dx,
+        0, 0, 0, dy,
+        0, 0, 0, dz,
+        dx,dy,dz, 0);
+      var m2 = new THREE.Matrix4().copy(m).multiply(m);
+      var c1 = Math.sinh(len);
+      var c2 = Math.cosh(len) - 1;
+      m.multiplyScalar(c1);
+      m2.multiplyScalar(c2);
+      var result = new THREE.Matrix4().identity();
+      result.add(m);
+      result.add(m2);
+      return result;
+    }
 }
 
 function parabolicBy2DVector(v) {  ///  something is wrong here we think...
