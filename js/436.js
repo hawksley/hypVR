@@ -45,15 +45,6 @@ rotz.multiply( translateByVector(new THREE.Vector3(0,0,-dist)) )
 
 var genQuatsColourSchemes = 
 [
-  [ //// 8 colours untwisted
-  new THREE.Quaternion(0,0,0,1),
-  new THREE.Quaternion(-1,0,0,0),
-  new THREE.Quaternion(1,0,0,0),
-  new THREE.Quaternion(0,-1,0,0),
-  new THREE.Quaternion(0,1,0,0),
-  new THREE.Quaternion(0,0,-1,0),
-  new THREE.Quaternion(0,0,1,0)
-  ],
   [ //// 8 colours twisted
   new THREE.Quaternion(0,0,0,1),
   new THREE.Quaternion(1,0,0,0),
@@ -63,6 +54,15 @@ var genQuatsColourSchemes =
   new THREE.Quaternion(0,0,1,0),
   new THREE.Quaternion(0,0,-1,0)
   ], 
+  [ //// 8 colours untwisted
+  new THREE.Quaternion(0,0,0,1),
+  new THREE.Quaternion(-1,0,0,0),
+  new THREE.Quaternion(1,0,0,0),
+  new THREE.Quaternion(0,-1,0,0),
+  new THREE.Quaternion(0,1,0,0),
+  new THREE.Quaternion(0,0,-1,0),
+  new THREE.Quaternion(0,0,1,0)
+  ],
   [ //// 2 colours
   new THREE.Quaternion(0,0,0,1),
   new THREE.Quaternion(0,0,0,-1),
