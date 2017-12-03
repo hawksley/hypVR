@@ -26,7 +26,7 @@ THREE.VREffect = function ( renderer, done ) {
 	var cameraLeft = new THREE.PerspectiveCamera();
 	var cameraRight = new THREE.PerspectiveCamera();
 
-	var frameData = new VRFrameData();
+	// var frameData = new VRFrameData();
 
 	this._renderer = renderer;
 
@@ -338,9 +338,4 @@ THREE.VREffect = function ( renderer, done ) {
 		};
 		return this.FovPortToProjection(fovPort, rightHanded, zNear, zFar);
 	};
-<<<<<<< HEAD
 };
-=======
-
-};
->>>>>>> master
