@@ -225,20 +225,18 @@ var fixOutside = true; //moves you back inside the central cell if you leave it
 /*
 Listen for double click event to enter full-screen VR mode
 */
-document.body.addEventListener( 'click', function() {
-  effect.setFullScreen( true );	if (event.target.id === "vr-icon") {
+document.body.addEventListener( 'click', function() {	
+  	if (event.target.id === "vr-icon") {
 		event.target.style.display = "none";
 		effect.phoneVR.setVRMode(!effect.phoneVR.isVRMode);
 	}
 
-  effect.setFullScreen( true );
+	effect.setFullScreen( true );
 
-
-  if (effect.phoneVR.orientationIsAvailable() && typeof window.screen.orientation !== 'undefined' && typeof window.screen.orientation.lock === 'function') {
-    window.screen.orientation.lock('landscape-primary');
-  }});
-
-var vrMode = false;
+	if (effect.phoneVR.orientationIsAvailable() && typeof window.screen.orientation !== 'undefined' && typeof window.screen.orientation.lock === 'function') {
+    	window.screen.orientation.lock('landscape-primary');
+	}
+});
 
 /*
 Listen for keyboard events
@@ -251,8 +249,7 @@ function onkey(event) {
   } else if (event.keyCode == 70 || event.keyCode == 13) { //f
     effect.setFullScreen(true); //fullscreen
   } else if (event.keyCode == 86 || event.keyCode == 13 || event.keyCode == 32 ) { // v or 'enter' or 'space' for VR mode
-    vrMode = !vrMode;
-    effect.setVRMode(vrMode);
+    effect.toggleVRMode();
   } else if (event.keyCode == 84) { // t
   	fixOutside = !fixOutside;
   }	else if (event.keyCode == 82) { // r
