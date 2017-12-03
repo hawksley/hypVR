@@ -23,7 +23,6 @@
  *
  */
 THREE.VREffect = function ( renderer, done ) {
-
 	var cameraLeft = new THREE.PerspectiveCamera();
 	var cameraRight = new THREE.PerspectiveCamera();
 
@@ -40,7 +39,6 @@ THREE.VREffect = function ( renderer, done ) {
 		self.rightEyeTranslation = { x: 0.03200000151991844, y: -0, z: -0, w: 0 };
 		self.leftEyeFOV = { upDegrees: 53.04646464878503, rightDegrees: 47.52769258067174, downDegrees: 53.04646464878503, leftDegrees: 46.63209579904155 };
 		self.rightEyeFOV = { upDegrees: 53.04646464878503, rightDegrees: 46.63209579904155, downDegrees: 53.04646464878503, leftDegrees: 47.52769258067174 };
-
 
 		if (!navigator.getVRDisplays && !navigator.mozGetVRDevices && !navigator.getVRDevices) {
 			if ( done ) {
@@ -67,8 +65,10 @@ THREE.VREffect = function ( renderer, done ) {
 					var parametersRight = vrHMD.getEyeParameters( "right" );
 					self.leftEyeTranslation = parametersLeft.offset;
 					self.rightEyeTranslation = parametersRight.offset;
-					self.leftEyeFOV = parametersLeft.fieldOfView;
-					self.rightEyeFOV = parametersRight.fieldOfView;
+					if (parametersLeft.fieldOfView !== undefined) {
+						self.leftEyeFOV = parametersLeft.fieldOfView;
+						self.rightEyeFOV = parametersRight.fieldOfView;
+					}
 					break; // We keep the first we encounter
 				}
 			}
@@ -109,6 +109,7 @@ THREE.VREffect = function ( renderer, done ) {
 
 	this._init();
 
+	var iconHidden = true;
 	this.render = function ( scene, camera, animate ) {
 		var renderer = this._renderer;
 		var vrHMD = this._vrHMD;
@@ -125,17 +126,21 @@ THREE.VREffect = function ( renderer, done ) {
 		}
 
 		requestAnimationFrame(animate);
-		// if (this.phoneVR.deviceAlpha !== null) { //default to stereo render for devices with orientation sensor, like mobile
-		// 	this.renderStereo.apply( this, [scene, camera] );
-		// 	return;
-		// }
+		if (iconHidden && this.phoneVR.orientationIsAvailable()) {
+			iconHidden = false;
+			document.getElementById("vr-icon").style.display = "block";
+		}
+
+		if ( this.phoneVR.isVRMode === true && this.phoneVR.orientationIsAvailable()) { //default to stereo render for devices with orientation sensor, like mobile
+			this.renderStereo.apply( this, [scene, camera] );
+			return;
+		}
 
 		// Regular render mode if not HMD
-		renderer.render.apply( this._renderer, [scene, camera] );
+		renderer.render.apply( this._renderer, [scene, camera]  );
 	};
 
 	this.renderStereo = function( scene, camera, renderTarget, forceClear ) {
-
 		var leftEyeTranslation = this.leftEyeTranslation;
 		var rightEyeTranslation = this.rightEyeTranslation;
 		var renderer = this._renderer;
@@ -188,11 +193,11 @@ THREE.VREffect = function ( renderer, done ) {
 		var canvas = renderer.domElement;
 
 		if (!vrHMD) {
-			return;
-		}
-
-		this._vrMode = !this._vrMode
-		if (this._vrMode) {
+ 			return;
+ 		}
+ 
+ 		this._vrMode = !this._vrMode
+ 		if (this._vrMode) {
 			vrHMD.requestPresent([{source: canvas, leftBounds: [0.0, 0.0, 0.5, 1.0], rightBounds: [0.5, 0.0, 0.5, 1.0]}]);
 		} else {
 			vrHMD.exitPresent();
@@ -200,12 +205,12 @@ THREE.VREffect = function ( renderer, done ) {
 	}
 
 	this.getVRMode = function() {
-		return this._vrMode;
-	}
-
-	this.getVRHMD = function() {
-		return this._vrHMD;
-	}
+ 		return this._vrMode;
+ 	}
+ 
+ 	this.getVRHMD = function() {
+ 		return this._vrHMD;
+ 	}
 
 	this.setFullScreen = function( enable ) {
 		var renderer = this._renderer;
@@ -333,4 +338,9 @@ THREE.VREffect = function ( renderer, done ) {
 		};
 		return this.FovPortToProjection(fovPort, rightHanded, zNear, zFar);
 	};
+<<<<<<< HEAD
 };
+=======
+
+};
+>>>>>>> master
